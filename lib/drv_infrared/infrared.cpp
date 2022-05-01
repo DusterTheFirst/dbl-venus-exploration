@@ -5,7 +5,7 @@ void infrared::init() {
     // TODO: Write initialization code
 }
 
-RobotSides infrared::sees_edge() {
+infrared::RobotSides infrared::sees_edge() {
     // TODO: detect edge on all four sides of the robot
 
     return ((RobotSides){
@@ -18,7 +18,7 @@ RobotSides infrared::sees_edge() {
     });
 }
 
-RobotSides infrared::sees_rock() {
+infrared::RobotSides infrared::sees_rock() {
     // TODO: detect rock on all four sides of the robot
 
     return ((RobotSides){

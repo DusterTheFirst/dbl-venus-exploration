@@ -1,9 +1,11 @@
 # Driver style guide
 
 "drivers" for various pieces of hardware are separated into various subdirectories
-in this directory. Each driver will compiled into static libraries and linked into
-the executable file. The reason for this separation is to allow each driver to define
-its own global variables and functions without interfering with other driver modules.
+in the `lib` directory. Drivers are distinguished from other libraries by having
+their directory name start with `drv_` (`motor` driver would be in `lib/drv_motor`).
+Each driver will compiled into static libraries and linked into the firmware.
+The reason for this separation is to allow each driver to define its own global
+variables and functions without interfering with other driver modules.
 
 In order for the main program to know the functions provided by the driver module,
 it must provide a `.hpp` file with the same name as its parent folder. This `.hpp`
@@ -14,7 +16,7 @@ For example, if you had a driver for the `motor`, your `motor.hpp` file would be
 as follows:
 
 ```cpp
-// In file: motor.hpp
+// In file: lib/drv_motor/motor.hpp
 
 // The following line is required to tell the compiler to only ever include this
 // header once
@@ -36,7 +38,10 @@ in a `.cpp` file with the same name as the module, in this example's case, that
 would be the file `motor.cpp`.
 
 ```cpp
-// In file: motor.cpp
+// In file: lib/drv_motor/motor.cpp
+
+#include <motor.hpp>
+
 void motor::init() {
     // Initialization code
 }

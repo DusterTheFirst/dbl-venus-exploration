@@ -1,7 +1,5 @@
 #pragma once
 
-#include <common.hpp>
-
 /**
  * @brief Driver for interfacing with the infrared sensors.
  * 
@@ -18,6 +16,16 @@ namespace infrared {
     void init();
 
     /**
+     * @brief Bitfields defining the different sides of the robot
+     */
+    struct RobotSides {
+        bool left : 1;
+        bool right : 1;
+        bool front : 1;
+        bool back : 1;
+    };
+
+    /**
      * @brief Detect presence of a cliff or boundary
      * 
      * @return A structure describing the edge status of the four sides of the robot
@@ -30,4 +38,5 @@ namespace infrared {
      * @return A structure describing the rock status of the four sides of the robot
      */
     RobotSides sees_rock();
+
 }
