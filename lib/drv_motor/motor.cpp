@@ -9,10 +9,9 @@ void motor::actuate_grabber(bool closed) {
     // TODO: move the grabber arm
 }
 
-// FIXME:(zach) Figure out a way to check for obsticles while this is happening?
-void motor::drive_forward(double distance) {
-    // TODO: drive both motors forward the given distance, ensuring that
-    // the motors turn at the same speed
+void motor::drive_straight(double speed) {
+    // TODO: drive both motors with the given speed, ensuring that
+    // the motors turn at the same speed as to not rotate
 }
 
 void motor::rotate_robot(double radians) {

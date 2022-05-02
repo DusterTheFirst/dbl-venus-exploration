@@ -23,11 +23,11 @@ namespace motor {
     void actuate_grabber(bool closed);
 
     /**
-     * @brief Drive the robot forward the specified distance
+     * @brief Drive the robot with the specified speed
      * 
-     * @param distance The distance to drive in meters
+     * @param distance The speed to drive in meters/second. positive = forward, negative = backwards
      */
-    void drive_forward(double distance);
+    void drive_straight(double speed);
 
     /**
      * @brief Rotate the robot in place, relative to its current heading
