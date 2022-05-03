@@ -27,14 +27,26 @@ namespace motor {
      * 
      * @param distance The speed to drive in meters/second. positive = forward, negative = backwards
      */
-    void drive_straight(double speed);
+    void drive_straight(float speed);
+
+    struct MotorPositions {
+        float left;
+        float right;
+    };
+
+    /**
+     * @brief Get the current motor positions
+     * 
+     * @return Structure representing the positions of the motors
+     */
+    MotorPositions get_motor_positions();
 
     /**
      * @brief Rotate the robot in place, relative to its current heading
      * 
      * @param radians The radians to rotate by, positive = left, negative = right
      */
-    void rotate_robot(double radians);
+    void rotate_robot(float radians);
     
     /**
      * @brief Point the ultrasonic rangefinder at the given heading
@@ -42,5 +54,5 @@ namespace motor {
      * @param heading The heading relative to the vehicle's forward vector in radians.
      * positive = left, negative = right
      */
-    void point_ultrasonic(double heading);
+    void point_ultrasonic(float heading);
 }
