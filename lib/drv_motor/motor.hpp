@@ -15,15 +15,27 @@ namespace motor {
      */
     void init();
 
+    /**
+     * @brief Defines the direction in which the robot should rotate
+     *
+     */
     enum class Direction { LEFT,
                            RIGHT };
+
+    /**
+     * @brief Defines the state that the grabber should be in
+     *
+     */
+    enum class GrabberPosition { OPEN,
+                                 CLOSED };
 
     /**
      * @brief Actuate the grabber on the front of the robot
      *
      * @param closed The state that the grabber should be in after this actuation
+     *
      */
-    void actuate_grabber(bool closed);
+    void actuate_grabber(motor::GrabberPosition position);
 
     /**
      * @brief Drive the robot with the specified speed
