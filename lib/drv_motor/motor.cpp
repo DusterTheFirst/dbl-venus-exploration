@@ -8,6 +8,7 @@
 
 Servo servoLeft;
 Servo servoRight;
+bool grabberClosed; // true if grabber is closed, false otherwise
 
 void motor::init() {
     gripper_servo.attach(GRIPPER_SERVO);
@@ -21,13 +22,14 @@ void motor::init() {
     servoRight.attach(SERVO_RIGHT_PIN);
 }
 
-void motor::actuate_grabber(bool closed) {
-    if (closed) {
-        // Close the gripper
-        gripper_servo.write(0);
-    } else {
-        // Open the gripper
-        gripper_servo.write(90);
+void motor::actuate_grabber(GrabberPosition position) {
+    // TODO: move the grabber arm
+
+    if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
+
+    } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
+
+    } else { // do nothing...
     }
 }
 
