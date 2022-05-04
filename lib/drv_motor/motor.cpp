@@ -1,8 +1,17 @@
 #include <Arduino.h>
+#include <Servo.h>
 #include <motor.hpp>
+
+#define SERVO_LEFT_PIN 12
+#define SERVO_RIGHT_PIN 13
+
+Servo servoLeft;
+Servo servoRight;
 
 void motor::init() {
     // TODO: Write initialization code
+    servoLeft.attach(SERVO_LEFT_PIN);
+    servoRight.attach(SERVO_RIGHT_PIN);
 }
 
 void motor::actuate_grabber(bool closed) {
@@ -14,9 +23,16 @@ void motor::drive_straight(float speed) {
     // the motors turn at the same speed as to not rotate
 }
 
-void motor::rotate_robot(float radians) {
+void motor::rotate_robot(float radians, Direction direction) {
     // TODO: drive each motor in opposite directions, causing the robot to rotate
     // the specified amount
+
+    if (direction == motor::Direction::LEFT) { // has to move left
+
+    } else if (direction == motor::Direction::RIGHT) { // has to move right
+
+    } else { // throw error
+    }
 }
 
 void motor::point_ultrasonic(float heading) {
