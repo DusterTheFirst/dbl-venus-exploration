@@ -37,7 +37,7 @@ namespace motor {
      * @param closed The state that the grabber should be in after this actuation
      *
      */
-    void actuate_grabber(motor::GrabberPosition position);
+    void actuate_grabber(GrabberPosition position);
 
     /**
      * @brief Drive the robot with the specified speed
@@ -64,7 +64,7 @@ namespace motor {
      *
      * @param radians The radians to rotate by, positive = left, negative = right
      */
-    void rotate_robot(float radians);
+    void rotate_robot(float radians, Direction direction);
 
     /**
      * @brief Point the ultrasonic rangefinder at the given heading
