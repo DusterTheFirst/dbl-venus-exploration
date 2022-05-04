@@ -3,16 +3,11 @@
 #include <motor.hpp>
 #include <telemetry.hpp>
 
-#define GRIPPER_SERVO 10
-#define ULTRASONIC_SERVO 11
-#define LEFT_DRIVE 12
-#define RIGHT_DRIVE 13
+#define SERVO_LEFT_PIN 12
+#define SERVO_RIGHT_PIN 13
 
-Servo gripper_servo;
-Servo ultrasonic_servo;
-
-Servo left_drive;
-Servo right_drive;
+Servo servoLeft;
+Servo servoRight;
 
 void motor::init() {
     gripper_servo.attach(GRIPPER_SERVO);
@@ -22,6 +17,8 @@ void motor::init() {
     right_drive.attach(RIGHT_DRIVE);
 
     // TODO: Write initialization code
+    servoLeft.attach(SERVO_LEFT_PIN);
+    servoRight.attach(SERVO_RIGHT_PIN);
 }
 
 void motor::actuate_grabber(bool closed) {
@@ -49,9 +46,16 @@ void motor::drive_straight(float speed) {
     right_drive.writeMicroseconds(microseconds);
 }
 
-void motor::rotate_robot(float radians) {
-    // TODO: drive each motor in opposite directions, causing the robot to
-    // rotate the specified amount
+void motor::rotate_robot(float radians, Direction direction) {
+    // TODO: drive each motor in opposite directions, causing the robot to rotate
+    // the specified amount
+
+    if (direction == motor::Direction::LEFT) { // has to move left
+
+    } else if (direction == motor::Direction::RIGHT) { // has to move right
+
+    } else { // throw error
+    }
 }
 
 void motor::point_ultrasonic(int32_t heading) {

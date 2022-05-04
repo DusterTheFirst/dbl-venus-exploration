@@ -17,6 +17,9 @@ namespace motor {
      */
     void init();
 
+    enum class Direction { LEFT,
+                           RIGHT };
+
     /**
      * @brief Actuate the grabber on the front of the robot
      *
