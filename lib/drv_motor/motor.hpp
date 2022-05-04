@@ -42,9 +42,10 @@ namespace motor {
     /**
      * @brief Drive the robot with the specified speed
      *
-     * @param distance The speed to drive in meters/second. positive = forward, negative = backwards
+     * @param time how much should the servos move for
+     * @param speed The speed to drive in meters/second. positive = forward, negative = backwards
      */
-    void drive_straight(float speed);
+    void drive_straight(float speed, int time);
 
     struct MotorPositions {
         float left;

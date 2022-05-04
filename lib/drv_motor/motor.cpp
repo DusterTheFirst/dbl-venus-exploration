@@ -33,7 +33,7 @@ void motor::actuate_grabber(GrabberPosition position) {
     }
 }
 
-void motor::drive_straight(float speed) {
+void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
 
