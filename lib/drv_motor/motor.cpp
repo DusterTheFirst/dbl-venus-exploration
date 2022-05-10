@@ -15,8 +15,8 @@ void motor::drive_straight(float speed) {
 }
 
 void motor::rotate_robot(float radians) {
-    // TODO: drive each motor in opposite directions, causing the robot to rotate
-    // the specified amount
+    // TODO: drive each motor in opposite directions, causing the robot to
+    // rotate the specified amount
 }
 
 void motor::point_ultrasonic(float heading) {

@@ -7,6 +7,6 @@ void ultrasonic::init() {
 
 float ultrasonic::distance() {
     // TODO: Write code
-    
+
     return 0.0;
 }
