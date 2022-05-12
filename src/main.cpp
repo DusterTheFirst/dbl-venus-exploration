@@ -17,8 +17,8 @@ void setup() {
 
 void loop() {
     telemetry::send("main:initialized", true);
-    telemetry::send("main:millis", (uint32_t)millis());
-    telemetry::send("main:micros", (uint32_t)micros());
+    telemetry::send("main:millis", millis());
+    telemetry::send("main:micros", micros());
     telemetry::send("main:zero", (uint8_t)0);
 
     delay(1000);
