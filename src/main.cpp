@@ -13,11 +13,13 @@
 
 void setup() {
     telemetry::init();
-
-    telemetry::send(F("initialization"), true);
-    // put your setup code here, to run once:
 }
 
 void loop() {
-    // put your main code here, to run repeatedly:
+    telemetry::send("main:initialized", true);
+    telemetry::send("main:millis", (uint32_t)millis());
+    telemetry::send("main:micros", (uint32_t)micros());
+    telemetry::send("main:zero", (uint8_t)0);
+
+    delay(1000);
 }
