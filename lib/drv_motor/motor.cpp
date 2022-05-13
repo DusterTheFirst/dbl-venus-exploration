@@ -6,40 +6,33 @@
 #define SERVO_LEFT_PIN 12
 #define SERVO_RIGHT_PIN 13
 #define GRABBER_PIN 10
+#define ULTRASONIC_SERVO_PIN 9
 
-const int motorPulseLow = 1300;  // at this point the motor is a full speed clockwise
-const int motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
-const int linearValueLow = -1;   // left margin of the interpolation values
-const int linearValueHigh = 1;   // right margin of the interpolation values
-const int grabberDegreesClosed = 0;
-const int grabberDegreesOpen = 180;
+const int16_t motorPulseLow = 1300;  // at this point the motor is a full speed clockwise
+const int16_t motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
+const int8_t linearValueLow = -1;    // left margin of the interpolation values
+const int8_t linearValueHigh = 1;    // right margin of the interpolation values
+const uint8_t grabberDegreesClosed = 0;
+const uint8_t grabberDegreesOpen = 180;
 
-Servo servoLeft;
-Servo servoRight;
-Servo grabber;
+Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 bool grabberClosed; // true if grabber is closed, false otherwise
 
 void motor::init() {
-    gripper_servo.attach(GRIPPER_SERVO);
-    ultrasonic_servo.attach(ULTRASONIC_SERVO);
-
-    left_drive.attach(LEFT_DRIVE);
-    right_drive.attach(RIGHT_DRIVE);
-
-    // TODO: Write initialization code
+    grabberServo.attach(GRABBER_PIN);
+    ultrasonicServo.attach(ULTRASONIC_SERVO_PIN);
     servoLeft.attach(SERVO_LEFT_PIN);
     servoRight.attach(SERVO_RIGHT_PIN);
-    grabber.attach(GRABBER_PIN);
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
     // TODO: move the grabber arm
 
     if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
-        grabber.write(grabberDegreesClosed);
+        grabberServo.write(grabberDegreesClosed);
         grabberClosed = !grabberClosed;
     } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
-        grabber.write(grabberDegreesOpen);
+        grabberServo.write(grabberDegreesOpen);
         grabberClosed = !grabberClosed;
     }
 }
@@ -47,16 +40,12 @@ void motor::actuate_grabber(GrabberPosition position) {
 void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
+    // telemetry::send("motor:drive_speed", speed);
+    // telemetry::send("motor:drive_micros", microseconds);
+    int interpolatedSpeed = interpolation(speed);
 
-    telemetry::send("motor:drive_speed", speed);
-
-    int32_t delta = speed * 200;
-    int32_t microseconds = 1500 + delta;
-
-    telemetry::send("motor:drive_micros", microseconds);
-
-    left_drive.writeMicroseconds(microseconds);
-    right_drive.writeMicroseconds(microseconds);
+    servoLeft.writeMicroseconds(interpolatedSpeed);
+    servoRight.writeMicroseconds(interpolatedSpeed);
 }
 
 void motor::rotate_robot(float radians, Direction direction) {
@@ -82,7 +71,7 @@ void motor::point_ultrasonic(int32_t heading) {
     }
 
     // Change reference to left facing = 0
-    ultrasonic_servo.write(heading + 90);
+    ultrasonicServo.write(heading + 90);
 }
 
 motor::MotorPositions motor::get_motor_positions() {
@@ -97,7 +86,7 @@ motor::MotorPositions motor::get_motor_positions() {
     };
 }
 
-int interpolation(float motorSpeed) {
+int16_t interpolation(float motorSpeed) {
 
     return motorPulseLow + (motorSpeed - linearValueLow) * (motorPulseHigh - motorPulseLow) / (linearValueHigh - linearValueLow);
 }
