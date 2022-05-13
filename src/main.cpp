@@ -24,7 +24,7 @@ void loop() {
     telemetry::send("main:zero", (uint8_t)0);
 
     for (float speed = -1.0; speed <= 1.0; speed += 0.1) {
-        motor::drive_straight(speed);
+        //  motor::drive_straight(speed); disable because it was cringe
     }
 
     delay(1000);
