@@ -12,7 +12,6 @@
 #define GRABBER_DEGREES_OPEN 180
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
-bool grabberClosed; // true if grabber is closed, false otherwise
 
 void motor::init() {
     grabberServo.attach(GRABBER_PIN);
@@ -22,14 +21,19 @@ void motor::init() {
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
-    if (!grabberClosed && position == GrabberPosition::OPEN) {
-        // should close the grabber
-        grabberServo.write(GRABBER_DEGREES_CLOSED);
-        grabberClosed = !grabberClosed;
-    } else if (grabberClosed && position == GrabberPosition::CLOSED) {
-        // should open the grabber
-        grabberServo.write(GRABBER_DEGREES_OPEN);
-        grabberClosed = !grabberClosed;
+    switch (position) {
+        case GrabberPosition::OPEN: {
+            // close the grabber
+            grabberServo.write(GRABBER_DEGREES_CLOSED);
+
+            break;
+        }
+        case GrabberPosition::CLOSED: {
+            // open the grabber
+            grabberServo.write(GRABBER_DEGREES_OPEN);
+
+            break;
+        }
     }
 }
 
