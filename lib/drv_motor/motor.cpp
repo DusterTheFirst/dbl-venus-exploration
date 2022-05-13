@@ -11,6 +11,8 @@ const int motorPulseLow = 1300;  // at this point the motor is a full speed cloc
 const int motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
 const int linearValueLow = -1;   // left margin of the interpolation values
 const int linearValueHigh = 1;   // right margin of the interpolation values
+const int grabberDegreesClosed = 0;
+const int grabberDegreesOpen = 180;
 
 Servo servoLeft;
 Servo servoRight;
@@ -34,10 +36,10 @@ void motor::actuate_grabber(GrabberPosition position) {
     // TODO: move the grabber arm
 
     if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
-        grabber.write(0);
+        grabber.write(grabberDegreesClosed);
         grabberClosed = !grabberClosed;
     } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
-        grabber.write(180);
+        grabber.write(grabberDegreesOpen);
         grabberClosed = !grabberClosed;
     }
 }
