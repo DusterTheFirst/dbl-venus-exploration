@@ -1,14 +1,31 @@
 #include <Arduino.h>
 
+// ----- Include telemetry -----
+#include <telemetry.hpp>
+
 // ----- Include drivers -----
 #include <infrared.hpp>
 #include <motor.hpp>
 #include <ultrasonic.hpp>
 
+// ----- Include pathfinding -----
+#include <pathfinding.hpp>
+
 void setup() {
-    // put your setup code here, to run once:
+    telemetry::init();
+    motor::init();
+    infrared::init();
 }
 
 void loop() {
-    // put your main code here, to run repeatedly:
+    telemetry::send("main:initialized", true);
+    telemetry::send("main:millis", millis());
+    telemetry::send("main:micros", micros());
+    telemetry::send("main:zero", (uint8_t)0);
+
+    for (float speed = -1.0; speed <= 1.0; speed += 0.1) {
+        motor::drive_straight(speed);
+    }
+
+    delay(1000);
 }
