@@ -76,12 +76,4 @@ namespace motor {
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
-
-    /**
-     * @brief Defines a linear interpolation for the motor speed from range of
-     * [-1,1] to range of [1300,1700]
-     *
-     * @param motorSpeed - floating point value [-1,1]
-     */
-    int16_t interpolation(float motorSpeed);
 }

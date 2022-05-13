@@ -8,12 +8,8 @@
 #define GRABBER_PIN 10
 #define ULTRASONIC_SERVO_PIN 9
 
-const int16_t motorPulseLow = 1300;  // at this point the motor is a full speed clockwise
-const int16_t motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
-const int8_t linearValueLow = -1;    // left margin of the interpolation values
-const int8_t linearValueHigh = 1;    // right margin of the interpolation values
-const uint8_t grabberDegreesClosed = 0;
-const uint8_t grabberDegreesOpen = 180;
+#define GRABBER_DEGREES_CLOSED 0
+#define GRABBER_DEGREES_OPEN 180
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 bool grabberClosed; // true if grabber is closed, false otherwise
@@ -26,13 +22,13 @@ void motor::init() {
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
-    // TODO: move the grabber arm
-
-    if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
-        grabberServo.write(grabberDegreesClosed);
+    if (!grabberClosed && position == GrabberPosition::OPEN) {
+        // should close the grabber
+        grabberServo.write(GRABBER_DEGREES_CLOSED);
         grabberClosed = !grabberClosed;
-    } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
-        grabberServo.write(grabberDegreesOpen);
+    } else if (grabberClosed && position == GrabberPosition::CLOSED) {
+        // should open the grabber
+        grabberServo.write(GRABBER_DEGREES_OPEN);
         grabberClosed = !grabberClosed;
     }
 }
@@ -49,14 +45,13 @@ void motor::drive_straight(float speed, int time) {
 }
 
 void motor::rotate_robot(float radians, Direction direction) {
-    // TODO: drive each motor in opposite directions, causing the robot to rotate
-    // the specified amount
+    // TODO: drive each motor in opposite directions, causing the robot to
+    // rotate the specified amount
 
     if (direction == motor::Direction::LEFT) { // has to move left
-
+        // TODO:
     } else if (direction == motor::Direction::RIGHT) { // has to move right
-
-    } else { // throw error
+        // TODO:
     }
 }
 
@@ -86,7 +81,24 @@ motor::MotorPositions motor::get_motor_positions() {
     };
 }
 
+/**
+ * @brief Defines a linear interpolation for the motor speed from range of
+ * [-1,1] to range of [1300,1700]
+ *
+ * @param motorSpeed - floating point value [-1,1]
+ */
 int16_t interpolation(float motorSpeed) {
+    // at this point the motor is a full speed clockwise
+    const int16_t motorPulseLow = 1300;
+    // at this point the motor is a full speed anticlockwise
+    const int16_t motorPulseHigh = 1700;
+    // left margin of the interpolation values
+    const int8_t linearValueLow = -1;
+    // right margin of the interpolation values
+    const int8_t linearValueHigh = 1;
 
-    return motorPulseLow + (motorSpeed - linearValueLow) * (motorPulseHigh - motorPulseLow) / (linearValueHigh - linearValueLow);
+    return motorPulseLow +
+           (motorSpeed - linearValueLow) *
+               (motorPulseHigh - motorPulseLow) /
+               (linearValueHigh - linearValueLow);
 }
