@@ -6,6 +6,11 @@
 #define SERVO_LEFT_PIN 12
 #define SERVO_RIGHT_PIN 13
 
+const int motorPulseLow = 1300;  // at this point the motor is a full speed clockwise
+const int motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
+const int linearValueLow = -1;   // left margin of the interpolation values
+const int linearValueHigh = 1;   // right margin of the interpolation values
+
 Servo servoLeft;
 Servo servoRight;
 bool grabberClosed; // true if grabber is closed, false otherwise
@@ -84,4 +89,9 @@ motor::MotorPositions motor::get_motor_positions() {
                      // the MotorPositions structure
         .right = 0.0
     };
+}
+
+int interpolation(float motorSpeed) {
+
+    return motorPulseLow + (motorSpeed - linearValueLow) * (motorPulseHigh - motorPulseLow) / (linearValueHigh - linearValueLow);
 }

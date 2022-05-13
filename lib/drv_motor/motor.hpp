@@ -72,5 +72,13 @@ namespace motor {
      * @param heading The heading relative to the vehicle's forward vector in radians.
      * positive = left, negative = right
      */
+
+    /**
+     * @brief Defines a linear interpolation for the motor speed from range of
+     * [-1,1] to range of [1300,1700]
+     *
+     * @param motorSpeed - floating point value [-1,1]
+     */
+    void interpolation(float motorSpeed);
     void point_ultrasonic(int32_t heading);
 }
