@@ -19,13 +19,16 @@ void setup() {
 
 void loop() {
     telemetry::send("main:initialized", true);
-    telemetry::send("main:millis", millis());
-    telemetry::send("main:micros", micros());
-    telemetry::send("main:zero", (uint8_t)0);
+    // telemetry::send("main:size_of_bool", sizeof(bool));
+    // telemetry::send("main:millis", millis());
+    // telemetry::send("main:micros", micros());
+    // telemetry::send("main:zero", (uint8_t)0);
 
-    for (float speed = -1.0; speed <= 1.0; speed += 0.1) {
-        motor::drive_straight(speed);
-    }
+    // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
+    //     motor::drive_straight(speed);
+    // }
 
-    delay(1000);
+    // telemetry::send("ultrasonic:distance", ultrasonic::distance());
+
+    // delay(100);
 }
