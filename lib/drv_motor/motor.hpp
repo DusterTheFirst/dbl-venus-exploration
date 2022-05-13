@@ -81,5 +81,5 @@ namespace motor {
      *
      * @param motorSpeed - floating point value [-1,1]
      */
-    void interpolation(float motorSpeed);
+    int interpolation(float motorSpeed);
 }

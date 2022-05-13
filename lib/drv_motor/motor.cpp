@@ -10,6 +10,8 @@ const int motorPulseLow = 1300;  // at this point the motor is a full speed cloc
 const int motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
 const int linearValueLow = -1;   // left margin of the interpolation values
 const int linearValueHigh = 1;   // right margin of the interpolation values
+const int grabberDegreesClosed = 0;
+const int grabberDegreesOpen = 180;
 
 Servo servoLeft;
 Servo servoRight;
@@ -27,10 +29,10 @@ void motor::actuate_grabber(GrabberPosition position) {
     // TODO: move the grabber arm
 
     if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
-        grabber.write(0);
+        grabber.write(grabberDegreesClosed);
         grabberClosed = !grabberClosed;
     } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
-        grabber.write(180);
+        grabber.write(grabberDegreesOpen);
         grabberClosed = !grabberClosed;
     }
 }
@@ -38,8 +40,13 @@ void motor::actuate_grabber(GrabberPosition position) {
 void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
-    servoLeft.writeMicroseconds(time);
-    servoRight.writeMicroseconds(time);
+    int speedInterpolated = interpolation(speed); // time to be fed into writeMicroSeconds [1300,1700]
+    unsigned long currentTime = millis();
+
+    while (millis() - currentTime <= time) {
+        servoLeft.writeMicroseconds(speedInterpolated);
+        servoRight.writeMicroseconds(speedInterpolated);
+    }
 }
 
 void motor::rotate_robot(float radians, Direction direction) {
