@@ -41,7 +41,10 @@ namespace motor {
      * @brief Drive the robot with the specified speed
      *
      * @param time how much should the servos move for
-     * @param speed The speed to drive in meters/second. positive = forward, negative = backwards
+     * @param speed The speed to drive in meters/second. Value between [-1,1]
+     * Negative value is forward and positive value is backward.
+     * The closer the value is to 0 from both sides, the slower the motor rotates.
+     * A value of 0 means that the motor stops.
      */
     void drive_straight(float speed, int time);
 
