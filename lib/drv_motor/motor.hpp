@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 /**
  * @brief Driver for interfacing with the servo motors.
  *
@@ -54,5 +56,5 @@ namespace motor {
      * @param heading The heading relative to the vehicle's forward vector in radians.
      * positive = left, negative = right
      */
-    void point_ultrasonic(float heading);
+    void point_ultrasonic(int32_t heading);
 }

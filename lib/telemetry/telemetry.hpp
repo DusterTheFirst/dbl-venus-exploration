@@ -51,4 +51,8 @@ namespace telemetry {
     SEND_IMPL(int64_t, "i64")
 
     SEND_IMPL(bool, "bool")
+
+    SEND_IMPL(float, "f32")
+    SEND_IMPL(double, "f32")
+    SEND_IMPL(long double, "f64") // FIXME: actual?
 }
