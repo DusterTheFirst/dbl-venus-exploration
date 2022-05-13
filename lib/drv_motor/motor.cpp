@@ -33,6 +33,28 @@ void motor::actuate_grabber(GrabberPosition position) {
     }
 }
 
+/**
+ * @brief Defines a linear interpolation for the motor speed from range of
+ * [-1,1] to range of [1300,1700]
+ *
+ * @param motorSpeed - floating point value [-1,1]
+ */
+int16_t interpolation(float motorSpeed) {
+    // at this point the motor is a full speed clockwise
+    const int16_t motorPulseLow = 1300;
+    // at this point the motor is a full speed anticlockwise
+    const int16_t motorPulseHigh = 1700;
+    // left margin of the interpolation values
+    const int8_t linearValueLow = -1;
+    // right margin of the interpolation values
+    const int8_t linearValueHigh = 1;
+
+    return motorPulseLow +
+           (motorSpeed - linearValueLow) *
+               (motorPulseHigh - motorPulseLow) /
+               (linearValueHigh - linearValueLow);
+}
+
 void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
@@ -55,7 +77,7 @@ void motor::rotate_robot(float radians, Direction direction) {
     }
 }
 
-void motor::point_ultrasonic(int32_t heading) {
+void motor::point_ultrasonic(int8_t heading) {
     // Clamp into known range
     if (heading < -90) {
         heading = -90;
@@ -79,26 +101,4 @@ motor::MotorPositions motor::get_motor_positions() {
                      // the MotorPositions structure
         .right = 0.0
     };
-}
-
-/**
- * @brief Defines a linear interpolation for the motor speed from range of
- * [-1,1] to range of [1300,1700]
- *
- * @param motorSpeed - floating point value [-1,1]
- */
-int16_t interpolation(float motorSpeed) {
-    // at this point the motor is a full speed clockwise
-    const int16_t motorPulseLow = 1300;
-    // at this point the motor is a full speed anticlockwise
-    const int16_t motorPulseHigh = 1700;
-    // left margin of the interpolation values
-    const int8_t linearValueLow = -1;
-    // right margin of the interpolation values
-    const int8_t linearValueHigh = 1;
-
-    return motorPulseLow +
-           (motorSpeed - linearValueLow) *
-               (motorPulseHigh - motorPulseLow) /
-               (linearValueHigh - linearValueLow);
 }
