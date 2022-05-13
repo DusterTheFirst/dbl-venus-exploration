@@ -4,6 +4,7 @@
 
 #define SERVO_LEFT_PIN 12
 #define SERVO_RIGHT_PIN 13
+#define GRABBER_PIN 10
 
 const int motorPulseLow = 1300;  // at this point the motor is a full speed clockwise
 const int motorPulseHigh = 1700; // at this point the motor is a full speed anticlockwise
@@ -12,22 +13,25 @@ const int linearValueHigh = 1;   // right margin of the interpolation values
 
 Servo servoLeft;
 Servo servoRight;
+Servo grabber;
 bool grabberClosed; // true if grabber is closed, false otherwise
 
 void motor::init() {
     // TODO: Write initialization code
     servoLeft.attach(SERVO_LEFT_PIN);
     servoRight.attach(SERVO_RIGHT_PIN);
+    grabber.attach(GRABBER_PIN);
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
     // TODO: move the grabber arm
 
     if (!grabberClosed && position == GrabberPosition::OPEN) { // should close the grabber
-
+        grabber.write(0);
+        grabberClosed = !grabberClosed;
     } else if (grabberClosed && position == GrabberPosition::CLOSED) { // should open the grabber
-
-    } else { // do nothing...
+        grabber.write(180);
+        grabberClosed = !grabberClosed;
     }
 }
 
