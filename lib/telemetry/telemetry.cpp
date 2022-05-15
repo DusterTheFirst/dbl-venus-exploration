@@ -17,8 +17,9 @@ void telemetry::__send(
     size_t metric_name_len = (strlen(metric_name) + 1);
     size_t metric_type_len = (strlen(metric_type) + 1);
 
-    size_t packet_length = metric_type_len + metric_name_len +
-                           metric_size + sizeof(size_t);
+    size_t packet_length = sizeof(uint32_t) +
+                           metric_type_len + metric_name_len + metric_size +
+                           sizeof(size_t);
     uint8_t *packet_buffer = (uint8_t *)malloc(packet_length);
 
     if (packet_buffer == NULL) {
@@ -29,6 +30,13 @@ void telemetry::__send(
     // Construct the packet
     {
         size_t bytes_written = 0;
+
+        uint32_t timestamp = millis();
+
+        // timestamp
+        memcpy(&packet_buffer[bytes_written],
+               (const uint8_t *)&timestamp, sizeof(uint32_t));
+        bytes_written += sizeof(uint32_t);
 
         // metric name
         memcpy(&packet_buffer[bytes_written],
