@@ -3,7 +3,7 @@
 #include <telemetry.hpp>
 
 void telemetry::init() {
-    Serial.begin(9600);
+    Serial.begin(115200);
 }
 
 void telemetry::__send(
