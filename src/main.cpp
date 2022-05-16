@@ -33,15 +33,16 @@ void loop() {
     // telemetry::send("main:super_long_name_with_an_ultra_wide_metric",
     // (uint64_t)0);
 
-    // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
-    //     motor::drive_straight(speed);
-    // }
+    for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
+        motor::drive_straight(speed, 0);
+    }
 
     bool led = digitalRead(LED_BUILTIN);
     telemetry::send("main:led", led);
     digitalWrite(LED_BUILTIN, !led);
 
-    // telemetry::send("ultrasonic:distance", ultrasonic::distance());
+    telemetry::send("ultrasonic:distance",
+                    micros() % 1000 /* ultrasonic::distance() */);
 
     delay(100);
 }

@@ -62,10 +62,11 @@ int16_t interpolation(float motorSpeed) {
 void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
-    // telemetry::send("motor:drive_speed", speed);
-    // telemetry::send("motor:drive_micros", microseconds);
+
+    telemetry::send("motor:drive_speed", speed);
     int interpolatedSpeed = interpolation(speed);
 
+    telemetry::send("motor:drive_micros", interpolatedSpeed);
     servoLeft.writeMicroseconds(interpolatedSpeed);
     servoRight.writeMicroseconds(interpolatedSpeed);
 }
