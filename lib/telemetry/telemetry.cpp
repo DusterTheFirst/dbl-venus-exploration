@@ -64,6 +64,7 @@ void telemetry::__send(
 
     if (cobs_buffer == NULL) {
         // OOM, drop this packet
+        free(packet_buffer);
         return;
     }
 
