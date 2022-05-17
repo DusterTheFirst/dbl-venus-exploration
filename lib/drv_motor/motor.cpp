@@ -92,6 +92,8 @@ void motor::point_ultrasonic(int8_t heading) {
         heading = 90;
     }
 
+    telemetry::send("ultrasonic:heading", heading);
+
     // Change reference to left facing = 0
     ultrasonicServo.write(heading + 90);
 }
