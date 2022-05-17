@@ -30,9 +30,10 @@ void loop() {
     // }
     for (int8_t heading = -90; heading <= 90; heading++) {
         motor::point_ultrasonic(heading);
-        telemetry::send("ultrasonic:distance", ultrasonic::distance());
+        // telemetry::send("ultrasonic:distance", ultrasonic::distance());
+        telemetry::send("ultrasonic:distance", micros() % 300);
 
-        delay(500);
+        delay(100);
     }
 
     delay(100);
