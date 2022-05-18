@@ -71,15 +71,22 @@ void motor::drive_straight(float speed, int time) {
     servoRight.writeMicroseconds(interpolatedSpeed);
 }
 
-void motor::rotate_robot(float radians, Direction direction) {
+void motor::rotate_robot(float degrees, Direction direction) {
     // TODO: drive each motor in opposite directions, causing the robot to
     // rotate the specified amount
 
-    if (direction == motor::Direction::LEFT) { // has to move left
-        // TODO:
-    } else if (direction == motor::Direction::RIGHT) { // has to move right
-        // TODO:
+    switch (direction) {
+        case Direction::RIGHT: {
+            // TODO:
+            break;
+        }
+        case Direction::LEFT: {
+            // TODO:
+            break;
+        }
     }
+
+    telemetry::send("motor:rotation_angle", degrees);
 }
 
 void motor::point_ultrasonic(int8_t heading) {
