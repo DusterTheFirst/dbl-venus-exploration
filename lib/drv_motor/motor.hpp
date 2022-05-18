@@ -65,9 +65,10 @@ namespace motor {
     /**
      * @brief Rotate the robot in place, relative to its current heading
      *
-     * @param degrees The degrees to rotate by, positive = left, negative = right
+     * @param degrees The degrees to rotate by. It is always positive.
+     * @param direction The direction in which the robot shall move (left or right)
      */
-    void rotate_robot(float degrees, Direction direction);
+    void rotate_robot(uint8_t degres, Direction direction);
 
     /**
      * @brief Point the ultrasonic rangefinder at the given heading
