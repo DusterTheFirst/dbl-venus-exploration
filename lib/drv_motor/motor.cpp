@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Servo.h>
+#include <gyro.hpp>
 #include <motor.hpp>
 #include <telemetry.hpp>
 
@@ -72,19 +73,38 @@ void motor::drive_straight(float speed, int time) {
     servoRight.writeMicroseconds(interpolatedSpeed);
 }
 
-void motor::rotate_robot(float degrees, Direction direction) {
+void motor::rotate_robot(uint8_t degrees, Direction direction) {
     // TODO: drive each motor in opposite directions, causing the robot to
     // rotate the specified amount
+    uint16_t destinationAngle = gyro::get_angle();
+    uint16_t currentAngle;
+    bool done = false; // variable to indicate that the robot is done rotating
 
     switch (direction) {
         case Direction::RIGHT: {
-            // TODO:
+            destinationAngle += degrees;
             break;
         }
         case Direction::LEFT: {
-            // TODO:
+            destinationAngle -= degrees;
             break;
         }
+    }
+
+    while (!done) {
+        currentAngle = gyro::get_angle();
+        switch (direction) {
+            case Direction::RIGHT: {
+                // move right
+                break;
+            }
+            case Direction::LEFT: {
+                // move left
+                break;
+            }
+        }
+        done = (currentAngle > destinationAngle && direction == Direction::RIGHT) ||
+               (currentAngle < destinationAngle && direction == Direction::LEFT);
     }
 
     telemetry::send("motor:rotation_angle", degrees);
