@@ -34,7 +34,7 @@ namespace motor {
     /**
      * @brief Actuate the grabber on the front of the robot
      *
-     * @param closed The state that the grabber should be in after this actuation
+     * @param position The state that the grabber should be in after this actuation
      *
      */
     void actuate_grabber(GrabberPosition position);

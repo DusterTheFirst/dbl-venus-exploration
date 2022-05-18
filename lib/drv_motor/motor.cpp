@@ -9,7 +9,7 @@
 #define ULTRASONIC_SERVO_PIN 9
 
 #define GRABBER_DEGREES_CLOSED 0
-#define GRABBER_DEGREES_OPEN 180
+#define GRABBER_DEGREES_OPEN 120
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
@@ -35,6 +35,7 @@ void motor::actuate_grabber(GrabberPosition position) {
             break;
         }
     }
+    telemetry::send("motor:grabber_open", position == GrabberPosition::OPEN ? true : false);
 }
 
 /**
