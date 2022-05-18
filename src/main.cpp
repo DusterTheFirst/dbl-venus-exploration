@@ -25,16 +25,26 @@ void setup() {
 }
 
 void loop() {
+    motor::point_ultrasonic(0);
+
     // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
     //     motor::drive_straight(speed, 0);
     // }
-    for (int8_t heading = -90; heading <= 90; heading++) {
-        motor::point_ultrasonic(heading);
-        // telemetry::send("ultrasonic:distance", ultrasonic::distance());
-        telemetry::send("ultrasonic:distance", micros() % 300);
 
-        delay(100);
-    }
+    // int64_t test_distance = 200;
+    telemetry::send("ultrasonic:distance", ultrasonic::distance());
 
-    delay(100);
+    // for (int8_t heading = -90; heading <= 90; heading += 5) {
+    // motor::point_ultrasonic(heading);
+    // delay(50);
+    // telemetry::send("ultrasonic:distance", ultrasonic::distance());
+    // telemetry::send("ultrasonic:distance", 300);
+    // test_distance += random(-10, 10);
+    // if (test_distance > 300) test_distance = 300;
+    // if (test_distance < 0) test_distance = 0;
+
+    // telemetry::send("ultrasonic:distance", test_distance); // FIXME: test
+    // }
+
+    delay(1000);
 }

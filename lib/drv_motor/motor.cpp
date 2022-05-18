@@ -6,7 +6,7 @@
 #define SERVO_LEFT_PIN 12
 #define SERVO_RIGHT_PIN 13
 #define GRABBER_PIN 10
-#define ULTRASONIC_SERVO_PIN 9
+#define ULTRASONIC_SERVO_PIN 11
 
 #define GRABBER_DEGREES_CLOSED 0
 #define GRABBER_DEGREES_OPEN 180
@@ -94,8 +94,17 @@ void motor::point_ultrasonic(int8_t heading) {
 
     telemetry::send("ultrasonic:heading", heading);
 
+    telemetry::send("ultrasonic:pre_heading", ultrasonicServo.read());
+
     // Change reference to left facing = 0
-    ultrasonicServo.write(heading + 90);
+    int8_t servo_command = 90 - heading;
+    int8_t pre_servo_command = ultrasonicServo.read();
+
+    uint8_t delay_ms = abs(servo_command - pre_servo_command) * 5;
+
+    ultrasonicServo.write(servo_command);
+
+    delay(delay_ms);
 }
 
 motor::MotorPositions motor::get_motor_positions() {
