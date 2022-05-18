@@ -24,27 +24,22 @@ void setup() {
     telemetry::send("main:running", true);
 }
 
-void loop() {
-    motor::point_ultrasonic(0);
+int8_t heading = -90;
+int8_t step = 1;
 
+void loop() {
     // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
     //     motor::drive_straight(speed, 0);
     // }
 
-    // int64_t test_distance = 200;
+    motor::point_ultrasonic(heading);
     telemetry::send("ultrasonic:distance", ultrasonic::distance());
 
-    // for (int8_t heading = -90; heading <= 90; heading += 5) {
-    // motor::point_ultrasonic(heading);
-    // delay(50);
-    // telemetry::send("ultrasonic:distance", ultrasonic::distance());
-    // telemetry::send("ultrasonic:distance", 300);
-    // test_distance += random(-10, 10);
-    // if (test_distance > 300) test_distance = 300;
-    // if (test_distance < 0) test_distance = 0;
+    heading += step;
 
-    // telemetry::send("ultrasonic:distance", test_distance); // FIXME: test
-    // }
-
-    delay(1000);
+    if (heading > 90) {
+        step = -1;
+    } else if (heading < -90) {
+        step = 1;
+    }
 }

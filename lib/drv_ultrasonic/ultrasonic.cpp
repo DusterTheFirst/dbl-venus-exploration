@@ -25,9 +25,11 @@ uint64_t ultrasonic::distance() {
     // whose duration is the time (in microseconds) from the sending of the ping
     // to the reception of its echo off of an object.
     pinMode(PING_PIN, INPUT);
-    noInterrupts();
+
+    // Do not disable interrupts, as it fucks with the Servo.h library
+    // noInterrupts();
     uint64_t duration = pulseIn(PING_PIN, HIGH);
-    interrupts();
+    // interrupts();
 
     return microsecondsToCentimeters(duration);
 }

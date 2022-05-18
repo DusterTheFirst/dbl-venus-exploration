@@ -11,13 +11,22 @@
 #define GRABBER_DEGREES_CLOSED 0
 #define GRABBER_DEGREES_OPEN 120
 
+#define MOTOR_STOP 1500
+
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
 void motor::init() {
     grabberServo.attach(GRABBER_PIN);
+    grabberServo.write(GRABBER_DEGREES_OPEN);
+
     ultrasonicServo.attach(ULTRASONIC_SERVO_PIN);
+    ultrasonicServo.write(0);
+
     servoLeft.attach(SERVO_LEFT_PIN);
+    servoLeft.write(MOTOR_STOP);
+
     servoRight.attach(SERVO_RIGHT_PIN);
+    servoRight.write(MOTOR_STOP);
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
@@ -35,7 +44,8 @@ void motor::actuate_grabber(GrabberPosition position) {
             break;
         }
     }
-    telemetry::send("motor:grabber_open", position == GrabberPosition::OPEN ? true : false);
+    telemetry::send("motor:grabber_open",
+                    position == GrabberPosition::OPEN ? true : false);
 }
 
 /**
@@ -90,24 +100,26 @@ void motor::rotate_robot(float degrees, Direction direction) {
     telemetry::send("motor:rotation_angle", degrees);
 }
 
+static uint8_t pre_servo_command = 0;
+
 void motor::point_ultrasonic(int8_t heading) {
     heading = clamp_heading(heading);
     telemetry::send("ultrasonic:heading", heading);
 
-    telemetry::send("ultrasonic:pre_heading", ultrasonicServo.read());
-
     // Change reference to left facing = 0
-    int8_t servo_command = 90 - heading;
-    int8_t pre_servo_command = ultrasonicServo.read();
+    uint8_t servo_command = 180 - (heading + 90);
 
-    uint8_t delay_ms = abs(servo_command - pre_servo_command) * 5;
+    uint8_t diff = abs(servo_command - pre_servo_command);
+
+    // Extra debug telemetry, normally unnecessary
+    // telemetry::send("ultrasonic:heading.servo_command", servo_command);
+    // telemetry::send("ultrasonic:heading.pre_servo_command", pre_servo_command);
+    // telemetry::send("ultrasonic:heading.diff", diff);
 
     ultrasonicServo.write(servo_command);
+    pre_servo_command = servo_command;
 
-    delay(delay_ms);
-
-    // Change reference to left facing = 0
-    ultrasonicServo.write(heading + 90);
+    delay(diff * 5);
 }
 
 int8_t motor::clamp_heading(int8_t heading) {
