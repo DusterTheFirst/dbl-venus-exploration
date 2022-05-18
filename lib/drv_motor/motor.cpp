@@ -83,6 +83,15 @@ void motor::rotate_robot(float radians, Direction direction) {
 }
 
 void motor::point_ultrasonic(int8_t heading) {
+
+    heading = clamp_heading(heading);
+    telemetry::send("ultrasonic:heading", heading);
+
+    // Change reference to left facing = 0
+    ultrasonicServo.write(heading + 90);
+}
+
+int8_t motor::clamp_heading(int8_t heading) {
     // Clamp into known range
     if (heading < -90) {
         heading = -90;
@@ -92,10 +101,7 @@ void motor::point_ultrasonic(int8_t heading) {
         heading = 90;
     }
 
-    telemetry::send("ultrasonic:heading", heading);
-
-    // Change reference to left facing = 0
-    ultrasonicServo.write(heading + 90);
+    return heading;
 }
 
 motor::MotorPositions motor::get_motor_positions() {
