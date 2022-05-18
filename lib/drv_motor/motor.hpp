@@ -34,7 +34,7 @@ namespace motor {
     /**
      * @brief Actuate the grabber on the front of the robot
      *
-     * @param closed The state that the grabber should be in after this actuation
+     * @param position The state that the grabber should be in after this actuation
      *
      */
     void actuate_grabber(GrabberPosition position);
@@ -65,9 +65,9 @@ namespace motor {
     /**
      * @brief Rotate the robot in place, relative to its current heading
      *
-     * @param radians The radians to rotate by, positive = left, negative = right
+     * @param radians The degrees to rotate by, positive = left, negative = right
      */
-    void rotate_robot(float radians, Direction direction);
+    void rotate_robot(float degres, Direction direction);
 
     /**
      * @brief Point the ultrasonic rangefinder at the given heading
@@ -76,4 +76,12 @@ namespace motor {
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
+
+    /**
+     * @brief clamps heading between [-90,90]
+     *
+     * @param heading The heading relative to the vehicle's forward vector in radians.
+     * positive = left, negative = right
+     */
+    int8_t clamp_heading(int8_t heading);
 }

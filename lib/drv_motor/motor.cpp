@@ -9,7 +9,7 @@
 #define ULTRASONIC_SERVO_PIN 11
 
 #define GRABBER_DEGREES_CLOSED 0
-#define GRABBER_DEGREES_OPEN 180
+#define GRABBER_DEGREES_OPEN 120
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
@@ -35,6 +35,7 @@ void motor::actuate_grabber(GrabberPosition position) {
             break;
         }
     }
+    telemetry::send("motor:grabber_open", position == GrabberPosition::OPEN ? true : false);
 }
 
 /**
@@ -71,27 +72,27 @@ void motor::drive_straight(float speed, int time) {
     servoRight.writeMicroseconds(interpolatedSpeed);
 }
 
-void motor::rotate_robot(float radians, Direction direction) {
+void motor::rotate_robot(float degrees, Direction direction) {
     // TODO: drive each motor in opposite directions, causing the robot to
     // rotate the specified amount
 
-    if (direction == motor::Direction::LEFT) { // has to move left
-        // TODO:
-    } else if (direction == motor::Direction::RIGHT) { // has to move right
-        // TODO:
+    switch (direction) {
+        case Direction::RIGHT: {
+            // TODO:
+            break;
+        }
+        case Direction::LEFT: {
+            // TODO:
+            break;
+        }
     }
+
+    telemetry::send("motor:rotation_angle", degrees);
 }
 
 void motor::point_ultrasonic(int8_t heading) {
-    // Clamp into known range
-    if (heading < -90) {
-        heading = -90;
-    }
 
-    if (heading > 90) {
-        heading = 90;
-    }
-
+    heading = clamp_heading(heading);
     telemetry::send("ultrasonic:heading", heading);
 
     telemetry::send("ultrasonic:pre_heading", ultrasonicServo.read());
@@ -105,6 +106,20 @@ void motor::point_ultrasonic(int8_t heading) {
     ultrasonicServo.write(servo_command);
 
     delay(delay_ms);
+
+    // Change reference to left facing = 0
+    ultrasonicServo.write(heading + 90);
+}
+
+int8_t motor::clamp_heading(int8_t heading) {
+    // Clamp into known range
+    if (heading < -90) {
+        heading = -90;
+    }
+
+    if (heading > 90) {
+        heading = 90;
+    }
 }
 
 motor::MotorPositions motor::get_motor_positions() {
