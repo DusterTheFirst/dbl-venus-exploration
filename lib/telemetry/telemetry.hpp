@@ -16,8 +16,8 @@ namespace telemetry {
     void init();
 
     void __send(
-        const char *field_name,
-        const char *packet_type,
+        const __FlashStringHelper *field_name,
+        const __FlashStringHelper *packet_type,
         const uint8_t *packet,
         const size_t packet_length);
 
@@ -29,7 +29,7 @@ namespace telemetry {
      * @param metric The metric being reported
      */
     template <typename T>
-    inline static void send(const char *name, T metric);
+    inline static void send(const __FlashStringHelper *name, T metric);
 
     /**
      * @brief Send an array of metrics to a telemetry subscriber
@@ -40,25 +40,26 @@ namespace telemetry {
      * @param length The length of the metric array being reported
      */
     template <typename T>
-    inline static void send_arr(const char *name, T *metrics, size_t length);
+    inline static void send_arr(const __FlashStringHelper *name, T *metrics,
+                                size_t length);
 
-#define SEND_IMPL(CTYPE, RTYPE)                               \
-    inline static void send(const char *name, CTYPE metric) { \
-        telemetry::__send(                                    \
-            name,                                             \
-            RTYPE,                                            \
-            (const uint8_t *)&metric,                         \
-            sizeof(metric));                                  \
+#define SEND_IMPL(CTYPE, RTYPE)                                              \
+    inline static void send(const __FlashStringHelper *name, CTYPE metric) { \
+        telemetry::__send(                                                   \
+            name,                                                            \
+            F(RTYPE),                                                        \
+            (const uint8_t *)&metric,                                        \
+            sizeof(metric));                                                 \
     }
 
-#define SEND_ARR_IMPL(CTYPE, RTYPE)                               \
-    inline static void send_arr(const char *name, CTYPE *metrics, \
-                                size_t length) {                  \
-        telemetry::__send(                                        \
-            name,                                                 \
-            RTYPE,                                                \
-            (const uint8_t *)metrics,                             \
-            sizeof(CTYPE) * length);                              \
+#define SEND_ARR_IMPL(CTYPE, RTYPE)                              \
+    inline static void send_arr(const __FlashStringHelper *name, \
+                                CTYPE *metrics, size_t length) { \
+        telemetry::__send(                                       \
+            name,                                                \
+            F(RTYPE),                                            \
+            (const uint8_t *)metrics,                            \
+            sizeof(CTYPE) * length);                             \
     }
 
     SEND_IMPL(uint8_t, "u8")

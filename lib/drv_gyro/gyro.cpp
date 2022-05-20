@@ -92,6 +92,6 @@ int16_t gyro::get_angle() {
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
-    telemetry::send("gyro:angle", ypr[0] * 180 / M_PI);
+    telemetry::send(F("gyro:angle"), ypr[0] * 180 / M_PI);
     return ypr[0] * 180 / M_PI;
 }

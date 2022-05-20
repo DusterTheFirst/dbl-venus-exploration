@@ -45,7 +45,7 @@ void motor::actuate_grabber(GrabberPosition position) {
             break;
         }
     }
-    telemetry::send("motor:grabber_open",
+    telemetry::send(F("motor:grabber_open"),
                     position == GrabberPosition::OPEN ? true : false);
 }
 
@@ -75,10 +75,10 @@ void motor::drive_straight(float speed, int time) {
     // TODO: drive both motors with the given speed, ensuring that
     // the motors turn at the same speed as to not rotate
 
-    telemetry::send("motor:drive_speed", speed);
+    telemetry::send(F("motor:drive_speed"), speed);
     int interpolatedSpeed = interpolation(speed);
 
-    telemetry::send("motor:drive_micros", interpolatedSpeed);
+    telemetry::send(F("motor:drive_micros"), interpolatedSpeed);
     servoLeft.writeMicroseconds(interpolatedSpeed);
     servoRight.writeMicroseconds(interpolatedSpeed);
 }
@@ -116,7 +116,7 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
         (direction == Direction::RIGHT && currentAngle < destinationAngle) ||
         (direction == Direction::LEFT && currentAngle > destinationAngle));
 
-    telemetry::send("motor:rotation_angle", degrees);
+    telemetry::send(F("motor:rotation_angle"), degrees);
 }
 
 /**
@@ -139,7 +139,7 @@ void motor::point_ultrasonic(int8_t heading) {
     static int8_t pre_heading = 0;
 
     heading = clamp_heading(heading);
-    telemetry::send("ultrasonic:heading", heading);
+    telemetry::send(F("ultrasonic:heading"), heading);
 
     // Calculate the difference in the previous heading and the current heading
     uint8_t diff;
@@ -148,15 +148,14 @@ void motor::point_ultrasonic(int8_t heading) {
     } else {
         diff = pre_heading - heading;
     }
-    telemetry::send("ultrasonic:heading2", heading);
 
     // Change reference to left facing = 0
     uint8_t servo_command = 180 - (heading + 90);
 
     // Extra debug telemetry, normally unnecessary
-    telemetry::send("ultrasonic:heading.servo_command", servo_command);
-    telemetry::send("ultrasonic:heading.pre_heading", pre_heading);
-    telemetry::send("ultrasonic:heading.diff", diff);
+    telemetry::send(F("ultrasonic:heading.servo_command"), servo_command);
+    telemetry::send(F("ultrasonic:heading.pre_heading"), pre_heading);
+    telemetry::send(F("ultrasonic:heading.diff"), diff);
 
     pre_heading = heading;
 

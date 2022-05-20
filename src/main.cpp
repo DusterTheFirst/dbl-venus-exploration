@@ -14,14 +14,14 @@
 void setup() {
     telemetry::init();
 
-    telemetry::send("main:initializing", true);
-    telemetry::send("main:running", false);
+    telemetry::send(F("main:initializing"), true);
+    telemetry::send(F("main:running"), false);
 
     motor::init();
     infrared::init();
 
-    telemetry::send("main:initializing", false);
-    telemetry::send("main:running", true);
+    telemetry::send(F("main:initializing"), false);
+    telemetry::send(F("main:running"), true);
 }
 
 #define STEP_BY 1
@@ -39,11 +39,11 @@ void loop() {
     motor::point_ultrasonic(heading);
     // uint16_t distance = ultrasonic::distance();
     uint64_t distance = random(0, 301);
-    telemetry::send("ultrasonic:distance", distance);
+    telemetry::send(F("ultrasonic:distance"), distance);
     last_readings[heading + 90] = distance;
 
     if (heading % 5 == 0) {
-        telemetry::send_arr("ultrasonic:last_readings", last_readings,
+        telemetry::send_arr(F("ultrasonic:last_readings"), last_readings,
                             sizeof(last_readings) / sizeof(last_readings[0]));
     }
 
