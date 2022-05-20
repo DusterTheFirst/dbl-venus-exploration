@@ -88,7 +88,6 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
     // rotate the specified amount
     uint16_t destinationAngle = gyro::get_angle();
     uint16_t currentAngle;
-    bool done = false; // variable to indicate that the robot is done rotating
 
     switch (direction) {
         case Direction::RIGHT: {
@@ -101,7 +100,7 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
         }
     }
 
-    while (!done) {
+    do {
         currentAngle = gyro::get_angle();
         switch (direction) {
             case Direction::RIGHT: {
@@ -113,9 +112,9 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
                 break;
             }
         }
-        done = (currentAngle > destinationAngle && direction == Direction::RIGHT) ||
-               (currentAngle < destinationAngle && direction == Direction::LEFT);
-    }
+    } while (
+        (direction == Direction::RIGHT && currentAngle < destinationAngle) ||
+        (direction == Direction::LEFT && currentAngle > destinationAngle));
 
     telemetry::send("motor:rotation_angle", degrees);
 }
