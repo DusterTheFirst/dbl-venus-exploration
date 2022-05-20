@@ -37,23 +37,23 @@ void loop() {
     // }
 
     motor::point_ultrasonic(heading);
-    uint16_t distance = ultrasonic::distance();
-    // uint64_t distance = random(0, 301);
+    // uint16_t distance = ultrasonic::distance();
+    uint64_t distance = random(0, 301);
     telemetry::send("ultrasonic:distance", distance);
     last_readings[heading + 90] = distance;
-
-    heading += step;
 
     if (heading % 5 == 0) {
         telemetry::send_arr("ultrasonic:last_readings", last_readings,
                             sizeof(last_readings) / sizeof(last_readings[0]));
     }
 
-    if (heading > 90) {
+    if (heading >= 90) {
         step = -STEP_BY;
-    } else if (heading < -90) {
+    } else if (heading <= -90) {
         step = STEP_BY;
     }
+
+    heading += step;
 
     delay(100);
 }

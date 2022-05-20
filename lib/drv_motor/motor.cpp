@@ -119,39 +119,50 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
     telemetry::send("motor:rotation_angle", degrees);
 }
 
-static uint8_t pre_servo_command = 0;
+/**
+ * @brief clamps heading between [-90,90]
+ *
+ * @param heading The heading relative to the vehicle's forward vector in degrees.
+ * positive = left, negative = right
+ */
+inline int8_t clamp_heading(int8_t heading) {
+    if (heading < -90) {
+        return -90;
+    } else if (heading > 90) {
+        return 90;
+    } else {
+        return heading;
+    }
+}
 
 void motor::point_ultrasonic(int8_t heading) {
+    static int8_t pre_heading = 0;
+
     heading = clamp_heading(heading);
     telemetry::send("ultrasonic:heading", heading);
+
+    // Calculate the difference in the previous heading and the current heading
+    uint8_t diff;
+    if (heading > pre_heading) {
+        diff = heading - pre_heading;
+    } else {
+        diff = pre_heading - heading;
+    }
+    telemetry::send("ultrasonic:heading2", heading);
 
     // Change reference to left facing = 0
     uint8_t servo_command = 180 - (heading + 90);
 
-    uint8_t diff = abs(servo_command - pre_servo_command);
-
     // Extra debug telemetry, normally unnecessary
-    // telemetry::send("ultrasonic:heading.servo_command", servo_command);
-    // telemetry::send("ultrasonic:heading.pre_servo_command", pre_servo_command);
-    // telemetry::send("ultrasonic:heading.diff", diff);
+    telemetry::send("ultrasonic:heading.servo_command", servo_command);
+    telemetry::send("ultrasonic:heading.pre_heading", pre_heading);
+    telemetry::send("ultrasonic:heading.diff", diff);
+
+    pre_heading = heading;
 
     ultrasonicServo.write(servo_command);
-    pre_servo_command = servo_command;
 
     delay(diff * 5);
-}
-
-int8_t motor::clamp_heading(int8_t heading) {
-    // Clamp into known range
-    if (heading < -90) {
-        heading = -90;
-    }
-
-    if (heading > 90) {
-        heading = 90;
-    }
-
-    return heading;
 }
 
 motor::MotorPositions motor::get_motor_positions() {
