@@ -6,6 +6,16 @@ void telemetry::init() {
     Serial.begin(115200);
 }
 
+// Pulled from COBS::getEncodedBufferSize
+#define COBS_getEncodedBufferSize(unencodedBufferSize) \
+    unencodedBufferSize + unencodedBufferSize / 254 + 1
+
+#define PACKET_BUFFER_LEN 420
+#define COBS_BUFFER_LEN COBS_getEncodedBufferSize(PACKET_BUFFER_LEN)
+
+uint8_t packet_buffer[PACKET_BUFFER_LEN];
+uint8_t cobs_buffer[COBS_BUFFER_LEN];
+
 void telemetry::__send(
     const char *metric_name,
     const char *metric_type,
@@ -20,11 +30,10 @@ void telemetry::__send(
     size_t packet_length = sizeof(uint32_t) +
                            metric_type_len + metric_name_len + metric_size +
                            sizeof(size_t);
-    uint8_t *packet_buffer = (uint8_t *)malloc(packet_length);
 
-    if (packet_buffer == NULL) {
-        // OOM, drop this packet
-        return;
+    if (packet_length > PACKET_BUFFER_LEN) {
+        // packet too large, drop
+        return; // TODO: report error somehow
     }
 
     // Construct the packet
@@ -58,14 +67,13 @@ void telemetry::__send(
         bytes_written += sizeof(size_t);
     }
 
-    // Allocate the COBS buffer
     size_t cobs_buffer_length = COBS::getEncodedBufferSize(packet_length);
-    uint8_t *cobs_buffer = (uint8_t *)malloc(cobs_buffer_length);
 
-    if (cobs_buffer == NULL) {
-        // OOM, drop this packet
-        free(packet_buffer);
-        return;
+    if (cobs_buffer_length > COBS_BUFFER_LEN) {
+        // packet too large, drop
+        return; // TODO: report error somehow, also this should never happen
+                // since the first check should fail not letting the code reach
+                // this point
     }
 
     // Encode the packet with COBS
@@ -78,8 +86,4 @@ void telemetry::__send(
 
     // Send the COBS encoded message
     Serial.write(cobs_buffer, bytes_written);
-
-    // Free the COBS encoded data and the packet
-    free(packet_buffer);
-    free(cobs_buffer);
 }
