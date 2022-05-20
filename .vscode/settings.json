@@ -1,3 +1,3 @@
 {
-    "cpplint.excludes": [".pio"]
+    "cpplint.excludes": [".pio", "lib/I2Cdev", "lib/MPU6050"]
 }
