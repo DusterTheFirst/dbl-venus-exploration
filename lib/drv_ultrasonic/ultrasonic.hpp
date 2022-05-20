@@ -12,5 +12,5 @@ namespace ultrasonic {
      *
      * @return The calculated distance in whole centimeters
      */
-    uint64_t distance();
+    uint16_t distance();
 }
