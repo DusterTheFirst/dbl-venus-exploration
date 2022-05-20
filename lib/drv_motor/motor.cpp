@@ -1,7 +1,7 @@
+#include "motor.hpp"
+#include "gyro.hpp"
 #include <Arduino.h>
 #include <Servo.h>
-#include <gyro.hpp>
-#include <motor.hpp>
 #include <telemetry.hpp>
 
 #define SERVO_LEFT_PIN 12
