@@ -1,5 +1,6 @@
 #pragma once
-#include <stdint.h>
+#include <I2Cdev.h>
+#include <MPU6050_6Axis_MotionApps20.h>
 
 /**
  * @brief Driver for interfacing with the gyroscope
@@ -8,6 +9,19 @@
  * for more information on driver subsystems.
  */
 namespace gyro {
+
+    /**
+     * @brief initialise the gyroscope with correct parameters
+     *
+     */
+    void init();
+
+    /**
+     * @brief initialise the MPU with correct parameters
+     *
+     */
+    void initMPU();
+
     /**
      * @brief Retrieve the distance measured by the ultrasonic sensor
      *
