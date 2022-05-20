@@ -91,3 +91,4 @@ void telemetry::__send(
     // Send the COBS encoded message
     Serial.write(cobs_buffer, bytes_written);
 }
+
