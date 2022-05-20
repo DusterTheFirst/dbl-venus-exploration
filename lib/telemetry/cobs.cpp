@@ -4,8 +4,16 @@
 
 #include "cobs.hpp"
 
-static inline void
-telemetry::cobs::serial_write(const uint8_t *data, const size_t size) {
+static inline void serial_write_byte(uint8_t byte) {
+#ifdef UNIT_TEST
+    telemetry::cobs::test::output[telemetry::cobs::test::byte_offset] = byte;
+    telemetry::cobs::test::byte_offset++;
+#else
+    Serial.write(byte);
+#endif
+}
+
+void telemetry::cobs::serial_write(const uint8_t *data, const size_t size) {
     if (data == NULL)
         return;
 
@@ -22,10 +30,10 @@ telemetry::cobs::serial_write(const uint8_t *data, const size_t size) {
         }
 
         // Write the distance to the next null byte
-        Serial.write(distance + 1);
+        serial_write_byte(distance + 1);
         // Write the non-null bytes
-        for (int i = 0; i < distance; i++) {
-            Serial.write(*data_ptr);
+        for (size_t i = 0; i < distance; i++) {
+            serial_write_byte(*data_ptr);
             data_ptr++;
         }
 
@@ -36,5 +44,5 @@ telemetry::cobs::serial_write(const uint8_t *data, const size_t size) {
         }
     }
 
-    Serial.write(0);
+    serial_write_byte(0);
 }
