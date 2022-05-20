@@ -77,12 +77,4 @@ namespace motor {
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
-
-    /**
-     * @brief clamps heading between [-90,90]
-     *
-     * @param heading The heading relative to the vehicle's forward vector in radians.
-     * positive = left, negative = right
-     */
-    int8_t clamp_heading(int8_t heading);
 }
