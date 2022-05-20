@@ -11,7 +11,8 @@ MPU6050 mpu;
 
 // MPU control/status vars
 bool dmpReady = false;  // set true if DMP init was successful
-uint8_t devStatus;      // return status after each device operation (0 = success, !0 = error)
+uint8_t devStatus;      // return status after each device operation
+                        // (0 = success, !0 = error)
 uint16_t packetSize;    // expected DMP packet size (default is 42 bytes)
 uint16_t fifoCount;     // count of all bytes currently in FIFO
 uint8_t fifoBuffer[64]; // FIFO storage buffer
@@ -19,7 +20,8 @@ uint8_t fifoBuffer[64]; // FIFO storage buffer
 // Orientation / motion vars
 Quaternion q;        // [w, x, y, z]         quaternion container
 VectorFloat gravity; // [x, y, z]            gravity vector
-float ypr[3];        // [yaw, pitch, roll]   yaw/pitch/roll container and gravity vector
+float ypr[3];        // [yaw, pitch, roll]   yaw/pitch/roll container
+                     // and gravity vector
 int angle;
 int current_angle = -200;
 int motor_modifier = -8;
@@ -33,23 +35,20 @@ void gyro::init() {
     Fastwire::setup(400, true);
 #endif
 
-    // Open serial
-    Serial.begin(115200);
-
     // Init connection
-    Serial.println(F("Initializing I2C devices..."));
+    telemetry::send(F("gyro:initialized"), false);
     mpu.initialize();
+    telemetry::send(F("gyro:initialized"), true);
 
     // verify connection
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU6050 connection successful") : F("MPU6050 connection failed"));
+    telemetry::send(F("gyro::connected"), mpu.testConnection());
 
     initMPU();
 }
 
 void gyro::initMPU() {
     // load and configure the DMP
-    Serial.println(F("Initializing DMP..."));
+    telemetry::send(F("gyro:dmp.initialized"), false);
     devStatus = mpu.dmpInitialize();
 
     // Gyro offset
@@ -59,13 +58,17 @@ void gyro::initMPU() {
     mpu.setZAccelOffset(1788); // 1688 factory default
 
     if (devStatus == 0) {
+        telemetry::send(F("gyro:dmp.initialized"), true);
+
         // Calibration Time: MPU6050
         mpu.CalibrateAccel(6);
         mpu.CalibrateGyro(6);
         mpu.PrintActiveOffsets();
         // turn on the DMP, now that it's ready
-        Serial.println(F("Enabling DMP..."));
+        telemetry::send(F("gyro:dmp.enabled"), false);
         mpu.setDMPEnabled(true);
+        telemetry::send(F("gyro:dmp.enabled"), true);
+
         dmpReady = true;
 
         // get expected DMP packet size for later comparison
@@ -75,15 +78,12 @@ void gyro::initMPU() {
         // 1 = initial memory load failed
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
-        Serial.print(F("DMP Initialization failed (code "));
-        Serial.print(devStatus);
-        Serial.println(F(")"));
+        telemetry::send(F("gyro:dmp.error_ode"), devStatus);
     }
 }
 
 int16_t gyro::get_angle() {
-
-    // wait untill the buffer has a value for the gyro
+    // wait until the buffer has a value for the gyro
     do {
         delayMicroseconds(5);
     } while (!mpu.dmpGetCurrentFIFOPacket(fifoBuffer) || !dmpReady);
@@ -92,6 +92,8 @@ int16_t gyro::get_angle() {
     mpu.dmpGetQuaternion(&q, fifoBuffer);
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
+
     telemetry::send(F("gyro:angle"), ypr[0] * 180 / M_PI);
+
     return ypr[0] * 180 / M_PI;
 }
