@@ -1,8 +1,7 @@
 {
     "cpplint.excludes": [
         ".pio",
-        "lib/I2Cdev",
-        "lib/MPU6050"
+        "deps",
     ],
     "cSpell.words": [
         "atmelavr"
