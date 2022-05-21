@@ -4,6 +4,8 @@
         "deps",
     ],
     "cSpell.words": [
-        "atmelavr"
+        "atmelavr",
+        "i2cdevlib",
+        "I2Cdev"
     ]
 }
