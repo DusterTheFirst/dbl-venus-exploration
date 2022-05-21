@@ -1,15 +1,11 @@
 #include <Arduino.h>
 
-#include <telemetry.hpp>
-#include <cobs.hpp>
+#include "cobs.hpp"
+#include "telemetry.hpp"
 
 void telemetry::init() {
     Serial.begin(115200);
 }
-
-#define PACKET_BUFFER_LEN 420
-
-uint8_t packet_buffer[PACKET_BUFFER_LEN];
 
 void telemetry::__send(
     const __FlashStringHelper *metric_name_fsh,
@@ -30,42 +26,24 @@ void telemetry::__send(
                            metric_type_len + metric_name_len + metric_size +
                            sizeof(size_t);
 
-    if (packet_length > PACKET_BUFFER_LEN) {
-        // packet too large, drop
-        return; // TODO: report error somehow
-    }
+    const uint32_t timestamp = millis();
 
     // Construct the packet
-    {
-        size_t bytes_written = 0;
-
-        uint32_t timestamp = millis();
-
+    chunk::Chunk chunk_arr[] = {
         // timestamp
-        memcpy(&packet_buffer[bytes_written],
-               (const uint8_t *)&timestamp, sizeof(uint32_t));
-        bytes_written += sizeof(uint32_t);
-
+        chunk::Chunk(false, (const uint8_t *)&timestamp, sizeof(uint32_t)),
         // metric name
-        memcpy_P(&packet_buffer[bytes_written],
-                 (const uint8_t *)metric_name, metric_name_len);
-        bytes_written += metric_name_len;
-
+        chunk::Chunk(true, (const uint8_t *)metric_name, metric_name_len),
         // metric type
-        memcpy_P(&packet_buffer[bytes_written],
-                 (const uint8_t *)metric_type, metric_type_len);
-        bytes_written += metric_type_len;
-
+        chunk::Chunk(true, (const uint8_t *)metric_type, metric_type_len),
         // metric
-        memcpy(&packet_buffer[bytes_written], metric, metric_size);
-        bytes_written += metric_size;
-
+        chunk::Chunk(false, metric, metric_size),
         // length of the raw packet
-        memcpy(&packet_buffer[bytes_written],
-               (uint8_t *)&packet_length, sizeof(size_t));
-        bytes_written += sizeof(size_t);
-    }
+        chunk::Chunk(false, (uint8_t *)&packet_length, sizeof(size_t)),
+    };
+
+    chunk::Chunks chunks(chunk_arr);
 
     // Send the COBS encoded message
-    telemetry::cobs::serial_write(packet_buffer, packet_length);
+    telemetry::cobs::serial_write(chunks);
 }

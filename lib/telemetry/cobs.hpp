@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "chunk.hpp"
 
 namespace telemetry {
     namespace cobs {
@@ -10,6 +11,6 @@ namespace telemetry {
             extern uint8_t *output;
         }
 #endif
-        void serial_write(const uint8_t *data, const size_t size);
+        void serial_write(const chunk::Chunks data);
     }
 }
