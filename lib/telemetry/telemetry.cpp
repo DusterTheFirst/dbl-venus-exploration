@@ -1,20 +1,15 @@
 #include <Arduino.h>
 
 #include <telemetry.hpp>
+#include <cobs.hpp>
 
 void telemetry::init() {
     Serial.begin(115200);
 }
 
-// TODO: Streaming COBS encoding to remove need for COBS buffer and or
-// the packet buffer to begin with
 #define PACKET_BUFFER_LEN 420
 
-// Pulled from COBS::getEncodedBufferSize
-#define COBS_BUFFER_LEN PACKET_BUFFER_LEN + PACKET_BUFFER_LEN / 254 + 1
-
 uint8_t packet_buffer[PACKET_BUFFER_LEN];
-uint8_t cobs_buffer[COBS_BUFFER_LEN];
 
 void telemetry::__send(
     const __FlashStringHelper *metric_name_fsh,
@@ -71,24 +66,6 @@ void telemetry::__send(
         bytes_written += sizeof(size_t);
     }
 
-    size_t cobs_buffer_length = COBS::getEncodedBufferSize(packet_length);
-
-    if (cobs_buffer_length > COBS_BUFFER_LEN) {
-        // packet too large, drop
-        return; // TODO: report error somehow, also this should never happen
-                // since the first check should fail not letting the code reach
-                // this point
-    }
-
-    // Encode the packet with COBS
-    size_t bytes_written = COBS::encode(packet_buffer, packet_length,
-                                        cobs_buffer);
-
-    // Add null byte packet delimeter
-    cobs_buffer[bytes_written] = 0;
-    bytes_written += 1;
-
     // Send the COBS encoded message
-    Serial.write(cobs_buffer, bytes_written);
+    telemetry::cobs::serial_write(packet_buffer, packet_length);
 }
-

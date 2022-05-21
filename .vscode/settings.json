@@ -1,3 +1,10 @@
 {
-    "cpplint.excludes": [".pio", "lib/I2Cdev", "lib/MPU6050"]
+    "cpplint.excludes": [
+        ".pio",
+        "lib/I2Cdev",
+        "lib/MPU6050"
+    ],
+    "cSpell.words": [
+        "atmelavr"
+    ]
 }

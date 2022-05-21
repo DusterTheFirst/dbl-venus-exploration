@@ -89,5 +89,4 @@ namespace telemetry {
     SEND_ARR_IMPL(double, "[f32]")
     SEND_IMPL(long double, "f64")       // FIXME: actual?
     SEND_ARR_IMPL(long double, "[f64]") // FIXME: actual?
-
 }
