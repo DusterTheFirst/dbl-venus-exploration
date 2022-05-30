@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ultrasonic.hpp>
+#include <math.h>
 
 // this constant won't change. It's the pin number of the sensor's output:
 #define PING_PIN 9
@@ -7,7 +8,7 @@
 uint16_t microsecondsToCentimeters(uint32_t microseconds) {
     // The speed of sound is 340 m/s or 29 microseconds per centimeter.
     // The ping travels out and back, so to find the distance of the object we
-    // take half of the distance travelled.
+    // take half of the distance traveled.
     return microseconds / 29 / 2;
 }
 
@@ -26,10 +27,22 @@ uint16_t ultrasonic::distance() {
     // to the reception of its echo off of an object.
     pinMode(PING_PIN, INPUT);
 
-    // Do not disable interrupts, as it fucks with the Servo.h library
+    // FIXME: Do not disable interrupts, as it fucks with the Servo.h library
     // noInterrupts();
     uint32_t duration = pulseIn(PING_PIN, HIGH);
     // interrupts();
 
     return microsecondsToCentimeters(duration);
+}
+
+uint16_t ultrasonic::mock_distance() {
+    static uint16_t distance = 200;
+
+    distance += random(-30, 30);
+
+    distance = max(min(distance, 300), 0);
+
+    delay(100);
+
+    return distance;
 }

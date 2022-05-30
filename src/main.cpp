@@ -37,11 +37,9 @@ void loop() {
     // }
 
     motor::point_ultrasonic(heading);
-    
+
     // uint16_t distance = ultrasonic::distance();
-    
-    uint64_t distance = random(0, 301);
-    delay(100);
+    uint16_t distance = ultrasonic::mock_distance();
 
     telemetry::send(F("ultrasonic:distance"), distance);
     last_readings[heading + 90] = distance;

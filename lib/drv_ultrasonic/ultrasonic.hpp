@@ -8,9 +8,20 @@
  */
 namespace ultrasonic {
     /**
-     * @brief Retrieve the distance measured by the ultrasonic sensor
+     * @brief Measure the distance using the ultrasonic sensor.
+     * 
+     * note: this method blocks for some milliseconds as it awaits the echo pulse.
      *
-     * @return The calculated distance in whole centimeters
+     * @return The calculated distance in whole centimeters.
      */
     uint16_t distance();
+
+    /**
+     * @brief Generate a pseudo-random distance for when the ultrasonic sensor is disconnected.
+     * 
+     * note: this method blocks for some milliseconds to mimic the wait for an echo pulse.
+     *
+     * @return The fake distance in whole centimeters.
+     */
+    uint16_t mock_distance();
 }
