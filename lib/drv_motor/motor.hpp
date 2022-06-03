@@ -71,10 +71,25 @@ namespace motor {
     void rotate_robot(uint8_t degres, Direction direction);
 
     /**
+     * @brief Give instructions for motors to continuously turn in a given direction
+     *
+     * @param direction The direction in which the robot shall move (left or right)
+     */
+    void turn_direction(Direction direction);
+
+    /**
      * @brief Point the ultrasonic rangefinder at the given heading
      *
      * @param heading The heading relative to the vehicle's forward vector in radians.
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
+
+    // /**
+    //  * @brief stops motor and deattaches the pins
+    //  *
+    //  */
+    // void stop_motor();
+
+    bool rotation_destination_reached(int poop1, int poop2);
 }

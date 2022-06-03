@@ -13,12 +13,13 @@
 #define GRABBER_DEGREES_OPEN 120
 
 #define MOTOR_STOP 1500
+#define MOTOR_ROTATE_SPEED 30
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
 void motor::init() {
     grabberServo.attach(GRABBER_PIN);
-    grabberServo.write(GRABBER_DEGREES_OPEN);
+    grabberServo.write(GRABBER_DEGREES_CLOSED);
 
     ultrasonicServo.attach(ULTRASONIC_SERVO_PIN);
     ultrasonicServo.write(0);
@@ -28,6 +29,37 @@ void motor::init() {
 
     servoRight.attach(SERVO_RIGHT_PIN);
     servoRight.write(MOTOR_STOP);
+}
+
+void stop_motor() {
+    servoLeft.write(MOTOR_STOP);
+    servoLeft.detach();
+
+    servoRight.write(MOTOR_STOP);
+    servoRight.detach();
+}
+
+void start_motor() {
+    servoLeft.write(MOTOR_STOP);
+    servoLeft.attach(SERVO_LEFT_PIN);
+
+    servoRight.write(MOTOR_STOP);
+    servoRight.attach(SERVO_RIGHT_PIN);
+}
+
+void motor::turn_direction(Direction direction) {
+    switch (direction) {
+        case Direction::RIGHT: {
+            servoLeft.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
+            servoRight.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
+            break;
+        }
+        case Direction::LEFT: {
+            servoLeft.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
+            servoRight.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
+            break;
+        }
+    }
 }
 
 void motor::actuate_grabber(GrabberPosition position) {
@@ -84,39 +116,77 @@ void motor::drive_straight(float speed, int time) {
 }
 
 void motor::rotate_robot(uint8_t degrees, Direction direction) {
+
+    start_motor();
     // TODO: drive each motor in opposite directions, causing the robot to
     // rotate the specified amount
-    uint16_t destinationAngle = gyro::get_angle();
-    uint16_t currentAngle;
+
+    // motor::stop_motor();
+
+    int32_t destinationAngleModulo = gyro::get_angle_modulo(gyro::get_angle());
+    int32_t initialAngleModulo = gyro::get_angle_modulo(gyro::get_angle());
+
+    telemetry::send(F("motor:initial_angle"), destinationAngleModulo);
+    telemetry::send(F("motor:turning_right"), direction == Direction::RIGHT);
+    uint16_t currentAngleModulo;
+    bool crossedBoundary = false;
 
     switch (direction) {
         case Direction::RIGHT: {
-            destinationAngle += degrees;
+            destinationAngleModulo += degrees;
+            // crossedBoundary = destinationAngleModulo > 360 ? true : false;
             break;
         }
         case Direction::LEFT: {
-            destinationAngle -= degrees;
+            destinationAngleModulo -= degrees;
+            // crossedBoundary = destinationAngleModulo < 0 ? true : false;
             break;
         }
     }
 
+    destinationAngleModulo = gyro::get_angle_modulo(destinationAngleModulo);
+
+    int previous_angle = gyro::get_acute_angle(destinationAngleModulo, initialAngleModulo);
+    int current_angle;
+    telemetry::send(F("motor:destination_angle"), destinationAngleModulo);
+    telemetry::send(F("motor:acute_angle"), previous_angle);
+
     do {
-        currentAngle = gyro::get_angle();
+        currentAngleModulo = gyro::get_angle_modulo(gyro::get_angle());
+        current_angle = gyro::get_acute_angle(currentAngleModulo, destinationAngleModulo);
+        telemetry::send(F("motor:current_angle"), currentAngleModulo);
+        // detect when boundary is crossed
+
+        // if (Direction::LEFT == direction && currentAngleModulo > initialAngleModulo) {
+        //     crossedBoundary = true;
+        // }
+
+        // if (Direction::RIGHT == direction && currentAngleModulo < initialAngleModulo) {
+        //     crossedBoundary = true;
+        // }
+
         switch (direction) {
             case Direction::RIGHT: {
-                // move right
+                motor::turn_direction(Direction::RIGHT);
+
                 break;
             }
             case Direction::LEFT: {
-                // move left
+                motor::turn_direction(Direction::LEFT);
                 break;
             }
         }
-    } while (
-        (direction == Direction::RIGHT && currentAngle < destinationAngle) ||
-        (direction == Direction::LEFT && currentAngle > destinationAngle));
+        if (motor::rotation_destination_reached(previous_angle, current_angle))
+            break;
+        previous_angle = current_angle;
+    } while (true);
 
     telemetry::send(F("motor:rotation_angle"), degrees);
+    stop_motor();
+}
+
+bool motor::rotation_destination_reached(int previous_angle, int current_angle) {
+    return previous_angle < current_angle || current_angle <= 3;
 }
 
 /**

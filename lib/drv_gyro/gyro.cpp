@@ -93,7 +93,17 @@ int16_t gyro::get_angle() {
     mpu.dmpGetGravity(&gravity, &q);
     mpu.dmpGetYawPitchRoll(ypr, &q, &gravity);
 
-    telemetry::send(F("gyro:angle"), ypr[0] * 180 / M_PI);
+    // telemetry::send(F("gyro:angle"), ypr[0] * 180 / M_PI);
 
     return ypr[0] * 180 / M_PI;
+}
+
+int gyro::get_acute_angle(int start, int end) {
+    int abs_angle_diff = max(start, end) - min(start, end);
+
+    return min(abs_angle_diff, 360 - abs_angle_diff);
+}
+
+uint16_t gyro::get_angle_modulo(int32_t angle) {
+    return (angle + 360) % 360;
 }

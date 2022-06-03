@@ -31,10 +31,19 @@ namespace gyro {
     int16_t get_angle();
 
     /**
+     * @brief Get the angle of the gyro modulo 360
+     *
+     * @return uint16_t - angle between [0,360] instead of [-180,180]
+     */
+    uint16_t get_angle_modulo(int32_t angle);
+
+    /**
      * @brief Get the acceleration object
      *
      * @return float Positive acceleration means forward movement.
      * Negative acceleration means backward movement.
      */
     float get_acceleration();
+
+    int get_acute_angle(int start, int end);
 }
