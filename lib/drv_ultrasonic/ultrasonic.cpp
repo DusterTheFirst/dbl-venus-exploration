@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <ultrasonic.hpp>
 #include <math.h>
+#include <ultrasonic.hpp>
 
 // this constant won't change. It's the pin number of the sensor's output:
 #define PING_PIN 9
@@ -45,4 +45,12 @@ uint16_t ultrasonic::mock_distance() {
     delay(100);
 
     return distance;
+}
+
+bool mountain() {
+    if (ultrasonic::distance() < 20) {
+        return true;
+    } else {
+        return false;
+    }
 }

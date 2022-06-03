@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 /**
  * @brief Driver for interfacing with the ultrasonic rangefinder
  *
@@ -24,4 +26,11 @@ namespace ultrasonic {
      * @return The fake distance in whole centimeters.
      */
     uint16_t mock_distance();
+
+    /**
+     * @brief Detects if there is a mountain or not
+     * 
+     * @return true if there is a mountain, false if none
+     */
+    bool mountain();
 }

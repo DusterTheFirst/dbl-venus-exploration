@@ -7,5 +7,6 @@
         "atmelavr",
         "i2cdevlib",
         "I2Cdev"
-    ]
+    ],
+    "cmake.configureOnOpen": false
 }

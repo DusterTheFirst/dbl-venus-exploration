@@ -1,6 +1,5 @@
 #pragma once
 
-#include <PacketSerial.h>
 #include <stdint.h>
 
 /**
