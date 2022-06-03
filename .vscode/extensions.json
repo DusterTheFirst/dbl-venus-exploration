@@ -3,7 +3,8 @@
     // for the documentation about the extensions.json format
     "recommendations": [
         "mine.cpplint",
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "wayou.vscode-todo-highlight"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
