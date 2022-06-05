@@ -15,6 +15,8 @@ namespace infrared {
      */
     void init();
 
+    uint16_t test();
+
     /**
      * @brief Bitfields defining the different sides of the robot
      */

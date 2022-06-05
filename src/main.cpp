@@ -12,8 +12,8 @@
 // ----- Include pathfinding -----
 #include <pathfinding.hpp>
 
-bool turnedOnce;
-uint32_t start;
+// ----- Include timekeeping -----
+#include <time.h>
 
 void setup() {
     telemetry::init();
@@ -29,11 +29,9 @@ void setup() {
     telemetry::send(F("main:initializing"), false);
     telemetry::send(F("main:running"), true);
 
-    start = millis();
-    turnedOnce = false;
-    // motor::rotate_robot(90, motor::Direction::LEFT);
-    // delay(5000);
-    // motor::rotate_robot(180, motor::Direction::RIGHT);
+    motor::rotate_robot(50, motor::Direction::RIGHT);
+    delay(5000);
+    motor::rotate_robot(140, motor::Direction::LEFT);
 }
 
 #define STEP_BY 1
@@ -44,6 +42,13 @@ int8_t step = STEP_BY;
 uint16_t last_readings[181] = { 0 };
 
 void loop() {
+    uint16_t test = infrared::test();
+    float voltage = ((float)test / (float)(1 << 10)) * 5.0;
+    telemetry::send(F("infrared:test"), test);
+    telemetry::send(F("infrared:voltage"), voltage);
+
+    delay(100);
+
     // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
     //     motor::drive_straight(speed, 0);
     // }
@@ -58,7 +63,7 @@ void loop() {
 
     // if (heading % 5 == 0) {
     //     telemetry::send_arr(F("ultrasonic:last_readings"), last_readings,
-    //                         sizeof(last_readings) / sizeof(last_readings[0]));
+    //                    sizeof(last_readings) / sizeof(last_readings[0]));
     // }
 
     // if (heading >= 90) {
@@ -69,15 +74,4 @@ void loop() {
 
     // heading += step;
     // telemetry::send(F)
-
-    if (millis() - start < 6000 && !turnedOnce) {
-        motor::rotate_robot(50, motor::Direction::RIGHT);
-        turnedOnce = true;
-    } else if ((6000 <= (millis() - start) && (millis() - start) < 16000) && turnedOnce) {
-        // telemetry::send(F("motor:rotation_angle"), 69);
-        motor::rotate_robot(140, motor::Direction::LEFT);
-        turnedOnce = false;
-    }
-
-    telemetry::send(F("test:gyro_angle"), gyro::get_angle());
 }

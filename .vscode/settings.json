@@ -5,8 +5,10 @@
     ],
     "cSpell.words": [
         "atmelavr",
+        "I2Cdev",
         "i2cdevlib",
-        "I2Cdev"
+        "millis",
+        "pathfinding"
     ],
     "cmake.configureOnOpen": false
 }
