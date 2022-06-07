@@ -117,8 +117,6 @@ bool rotation_destination_reached(int previous_angle, int current_angle) {
 }
 
 void motor::rotate_robot(uint8_t degrees, Direction direction) {
-    start_motor();
-
     uint16_t initial_angle_mod = gyro::get_angle_modulo(gyro::get_angle());
 
     telemetry::send(F("motor:initial_angle"), initial_angle_mod);
@@ -148,6 +146,7 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
     uint16_t current_angle_mod;
     uint8_t current_acute;
 
+    start_motor();
     while (true) {
         current_angle_mod = gyro::get_angle_modulo(gyro::get_angle());
 
@@ -163,9 +162,9 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
 
         previous_acute = current_acute;
     }
+    stop_motor();
 
     telemetry::send(F("motor:rotation_angle"), degrees);
-    stop_motor();
 }
 
 /**
