@@ -9,7 +9,10 @@ static const uint8_t VECTOR_TABLE_LENGTH =
 void telemetry::command::load_vector_table(
     telemetry::command::VectorTable vector_table) {
     global_vector_table = vector_table;
+
+#if TELEMETRY_COMMAND_DEBUG
     telemetry::send(F("command:vector_table.loaded"), true);
+#endif
 }
 
 bool telemetry::command::process_command() {

@@ -19,9 +19,12 @@
 void setup() {
     telemetry::init();
 
+    // Give the serial port time to connect
+    delay(1000);
+
     telemetry::command::load_vector_table({
-        .StoreInfraredAmbient = infrared::calibrate_ambient,
-        .StoreInfraredReference = infrared::calibrate_reference,
+        .CalibrateAmbientInfrared = infrared::calibrate_ambient,
+        .CalibrateReferenceInfrared = infrared::calibrate_reference,
     });
 
     telemetry::send(F("main:initializing"), true);

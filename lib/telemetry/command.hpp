@@ -9,8 +9,8 @@ namespace telemetry {
         typedef void (*Vector)(void);
 
         struct VectorTable {
-            Vector StoreInfraredAmbient;
-            Vector StoreInfraredReference;
+            Vector CalibrateAmbientInfrared;
+            Vector CalibrateReferenceInfrared;
         };
 
         void load_vector_table(VectorTable vector_table);
