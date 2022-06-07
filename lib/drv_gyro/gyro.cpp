@@ -98,8 +98,8 @@ int16_t gyro::get_angle() {
     return ypr[0] * 180 / M_PI;
 }
 
-int gyro::get_acute_angle(int start, int end) {
-    int abs_angle_diff = max(start, end) - min(start, end);
+uint8_t gyro::get_acute_angle(uint16_t start, uint16_t end) {
+    uint16_t abs_angle_diff = max(start, end) - min(start, end);
 
     return min(abs_angle_diff, 360 - abs_angle_diff);
 }

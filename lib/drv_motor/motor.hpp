@@ -84,12 +84,4 @@ namespace motor {
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
-
-    // /**
-    //  * @brief stops motor and deattaches the pins
-    //  *
-    //  */
-    // void stop_motor();
-
-    bool rotation_destination_reached(int poop1, int poop2);
 }
