@@ -16,8 +16,8 @@ namespace time {
      * It is best to call this at the end of main so that no time is skipped
      * before the first call to loop()
      */ 
-    inline void init();
+    void init();
 
-    inline bool is_before(uint32_t time_in_millis);
-    inline bool is_after(uint32_t time_in_millis);
+    bool is_before(uint32_t time_in_millis);
+    bool is_after(uint32_t time_in_millis);
 }
