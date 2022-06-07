@@ -12,7 +12,7 @@ namespace telemetry {
      *
      * Initialize the serial port
      */
-    void init();
+    void init(void);
 
     void __send(
         const __FlashStringHelper *field_name,
