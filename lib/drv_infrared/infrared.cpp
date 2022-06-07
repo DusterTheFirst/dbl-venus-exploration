@@ -35,11 +35,30 @@ void infrared::init() {
     // Load calibration data from the EEPROM
     EEPROM.get(CALIBRATION_ADDRESS, calibration);
 
-    telemetry::send(F("infrared:calibration"), calibration);
+    telemetry::send_arr(F("infrared:calibration"), (uint16_t *)&calibration,
+                        sizeof(calibration) / sizeof(uint16_t));
 }
 
-uint16_t infrared::test() {
+uint16_t infrared::test_raw() {
     return (uint16_t)analogRead(CLIFF_SENSOR_1);
+}
+
+bool infrared::test_detect_rock(int16_t *margin) {
+    return false;
+}
+
+bool infrared::test_detect_cliff(int16_t *margin) {
+    return false;
+}
+
+void infrared::calibrate_ambient() {
+    telemetry::send(F("infrared:calibrating.ambient"), true);
+    telemetry::send(F("infrared:calibrating.ambient"), false);
+}
+
+void infrared::calibrate_reference() {
+    telemetry::send(F("infrared:calibrating.reference"), true);
+    telemetry::send(F("infrared:calibrating.reference"), false);
 }
 
 infrared::RobotSides infrared::sees_edge() {

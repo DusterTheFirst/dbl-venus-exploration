@@ -15,7 +15,12 @@ namespace infrared {
      */
     void init();
 
-    uint16_t test();
+    uint16_t test_raw();
+    bool test_detect_rock(int16_t *margin = NULL);
+    bool test_detect_cliff(int16_t *margin = NULL);
+
+    void calibrate_ambient();
+    void calibrate_reference();
 
     /**
      * @brief Bitfields defining the different sides of the robot
