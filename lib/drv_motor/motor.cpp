@@ -17,6 +17,38 @@
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
+motor::Movement movementHistory[20];
+int index = 0;
+
+void motor::pushHistory(Movement movement) {
+    movementHistory[++index] = movement;
+}
+
+motor::Movement motor::popHistory() {
+    return movementHistory[index--];
+}
+
+motor::Movement motor::getOppositeMovement(Movement movement) {
+    Movement oppositeMovement;
+    if (movement.degrees != 0) {
+        oppositeMovement.direction = movement.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+        oppositeMovement.degrees = movement.degrees;
+        oppositeMovement.speed = 0;
+        oppositeMovement.time = 0;
+    } else {
+        oppositeMovement.speed = 3000 - movement.speed;
+        oppositeMovement.time = movement.time;
+        oppositeMovement.degrees = 0;
+        oppositeMovement.direction = Direction::LEFT;
+    }
+
+    return oppositeMovement;
+}
+
+int motor::getIndex() {
+    return index;
+}
+
 void motor::init() {
     grabberServo.attach(GRABBER_PIN);
     grabberServo.write(GRABBER_DEGREES_CLOSED);

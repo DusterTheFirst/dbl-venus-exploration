@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Arduino.h>
 #include <stdint.h>
+#include <telemetry.hpp>
 
 /**
  * @brief Driver for interfacing with the servo motors.
@@ -30,6 +32,20 @@ namespace motor {
      */
     enum class GrabberPosition { OPEN,
                                  CLOSED };
+
+    struct Movement {
+        motor::Direction direction;
+        uint8_t degrees = 0;
+        float time;
+        int speed;
+
+        inline void send() {
+            telemetry::send(F("movement:degrees"), this->degrees);
+            telemetry::send(F("movement:direction_left"), this->direction == Direction::LEFT ? 1 : 0);
+            // telemetry::send(F("movement:degrees"), this->degrees);
+            // telemetry::send(F("movement:degrees"), this->degrees);
+        }
+    };
 
     /**
      * @brief Actuate the grabber on the front of the robot
@@ -84,4 +100,33 @@ namespace motor {
      * positive = left, negative = right
      */
     void point_ultrasonic(int8_t heading);
+
+    /**
+     * @brief Pushes an element to the movement history 'queue'
+     *
+     * @param movement
+     */
+    void pushHistory(Movement movement);
+
+    /**
+     * @brief pops the last element from the 'queue' of the movement history
+     *
+     * @return Movement
+     */
+    Movement popHistory();
+
+    /**
+     * @brief Get the last index of the 'queue'
+     *
+     * @return int
+     */
+    int getIndex();
+
+    /**
+     * @brief Get the Opposite Movement object
+     *
+     * @param movement
+     * @return Movement
+     */
+    Movement getOppositeMovement(Movement movement);
 }
