@@ -21,11 +21,11 @@ motor::Movement movementHistory[20];
 int index = 0;
 
 void motor::pushHistory(Movement movement) {
-    movementHistory[++index] = movement;
+    movementHistory[index++] = movement;
 }
 
 motor::Movement motor::popHistory() {
-    return movementHistory[index--];
+    return movementHistory[--index];
 }
 
 motor::Movement motor::getOppositeMovement(Movement movement) {
@@ -136,12 +136,23 @@ int16_t interpolation(float motorSpeed) {
 }
 
 void motor::drive_straight(float speed, int time) {
+
+    start_motor();
     telemetry::send(F("motor:drive_speed"), speed);
     int interpolated_speed = interpolation(speed);
 
-    telemetry::send(F("motor:drive_micros"), interpolated_speed);
-    servoLeft.writeMicroseconds(interpolated_speed);
-    servoRight.writeMicroseconds(interpolated_speed);
+    long start = millis();
+    while (millis() - start <= time) {
+
+        // telemetry::send(F("motor:drive_micros"), interpolated_speed);
+        // servoLeft.writeMicroseconds(interpolated_speed);
+        // servoRight.writeMicroseconds(3000 - interpolated_speed);
+        telemetry::send(F("motor:drive_micros"), speed);
+        servoLeft.writeMicroseconds(3000 - speed);
+        servoRight.writeMicroseconds(speed);
+    }
+
+    stop_motor();
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {
