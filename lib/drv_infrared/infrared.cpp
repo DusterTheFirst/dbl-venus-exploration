@@ -24,7 +24,7 @@ struct IRCalibration {
 
 static IRCalibration calibration;
 
-void load_calibration() {
+void load_calibration(void) {
     // Load calibration data from the EEPROM
     EEPROM.get(CALIBRATION_ADDRESS, calibration);
 
@@ -32,7 +32,7 @@ void load_calibration() {
                         sizeof(calibration) / sizeof(uint16_t));
 }
 
-void store_calibration() {
+void store_calibration(void) {
     telemetry::send_arr(F("infrared:calibration"), (uint16_t *)&calibration,
                         sizeof(calibration) / sizeof(uint16_t));
 
@@ -40,7 +40,7 @@ void store_calibration() {
     EEPROM.put(CALIBRATION_ADDRESS, calibration);
 }
 
-void infrared::init() {
+void infrared::init(void) {
     analogReference(DEFAULT);
 
     pinMode(CLIFF_SENSOR_1, INPUT);
@@ -51,30 +51,73 @@ void infrared::init() {
     load_calibration();
 }
 
-uint16_t infrared::test_raw() {
+uint16_t infrared::test_raw(void) {
     return (uint16_t)analogRead(CLIFF_SENSOR_1);
 }
 
-bool infrared::test_detect_rock(int16_t *const margin) {
+bool infrared::test_detect_rock(void) {
     uint16_t reference = calibration.rock.reference;
     uint16_t ambient = calibration.rock.ambient;
 
+    telemetry::send(F("infrared:calibration.reference"), reference);
+    telemetry::send(F("infrared:calibration.ambient"), ambient);
+
+    bool above_ambient = reference > ambient;
+
     uint16_t reading = infrared::test_raw();
+    uint16_t reading_ambient_diff;
+    if (above_ambient) {
+        reading_ambient_diff = reading - ambient;
+    } else {
+        reading_ambient_diff = ambient - reading;
+    }
 
-    uint16_t abs_diff = max(reference, ambient) - min(reference, ambient);
-    uint16_t quartile = abs_diff / 4;
-    uint16_t top_quartile = ambient + quartile * 3;
+    uint16_t quartile_width = (max(reference, ambient) -
+                               min(reference, ambient)) /
+                              4;
 
-    *margin = top_quartile;
+    uint16_t on_thresh;
+    uint16_t off_thresh;
+    if (above_ambient) {
+        on_thresh = ambient + quartile_width * 3;
+        off_thresh = ambient + quartile_width * 2;
+    } else {
+        on_thresh = ambient - quartile_width * 3;
+        off_thresh = ambient - quartile_width * 2;
+    }
 
-    return reading > top_quartile;
+    telemetry::send(F("infrared:test.on_thresh"), on_thresh);
+    telemetry::send(F("infrared:test.off_thresh"), off_thresh);
+
+    static bool previous_state = false;
+
+    // Schmidt Trigger
+    if (previous_state) {
+        // Check if crossed off threshold
+        if ((above_ambient && reading < off_thresh) ||
+            (!above_ambient && reading > off_thresh)) {
+            previous_state = false;
+            return false;
+        } else {
+            return true;
+        }
+    } else {
+        // Check if crossed on threshold
+        if ((above_ambient && reading > on_thresh) ||
+            (!above_ambient && reading < on_thresh)) {
+            previous_state = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 
-bool infrared::test_detect_cliff(int16_t *const margin) {
+bool infrared::test_detect_cliff(void) {
     return false;
 }
 
-void infrared::calibrate_ambient() {
+void infrared::calibrate_ambient(void) {
     telemetry::send(F("infrared:calibrating.ambient"), true);
 
     // Take an incremental average for an amount of time, and store in EEPROM
@@ -97,7 +140,7 @@ void infrared::calibrate_ambient() {
     store_calibration();
 }
 
-void infrared::calibrate_reference() {
+void infrared::calibrate_reference(void) {
     telemetry::send(F("infrared:calibrating.reference"), true);
 
     // Take an incremental average for an amount of time, and store in EEPROM

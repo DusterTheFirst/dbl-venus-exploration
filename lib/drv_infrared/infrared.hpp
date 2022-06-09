@@ -13,14 +13,14 @@ namespace infrared {
      * This function is called once on start up allowing for initialization
      * code to prepare the attached hardware or to put it into a known state
      */
-    void init();
+    void init(void);
 
-    uint16_t test_raw();
-    bool test_detect_rock(int16_t *margin = NULL);
-    bool test_detect_cliff(int16_t *margin = NULL);
+    uint16_t test_raw(void);
+    bool test_detect_rock(void);
+    bool test_detect_cliff(void);
 
-    void calibrate_ambient();
-    void calibrate_reference();
+    void calibrate_ambient(void);
+    void calibrate_reference(void);
 
     /**
      * @brief Bitfields defining the different sides of the robot

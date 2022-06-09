@@ -61,13 +61,8 @@ void loop() {
     telemetry::send(F("infrared:test"), test);
     telemetry::send(F("infrared:voltage"), voltage);
 
-    int16_t rock_diff, cliff_diff;
-    telemetry::send(F("infrared:rock"),
-                    infrared::test_detect_rock(&rock_diff));
-    telemetry::send(F("infrared:cliff"),
-                    infrared::test_detect_cliff(&cliff_diff));
-    telemetry::send(F("infrared:rock.diff"), rock_diff);
-    telemetry::send(F("infrared:cliff.diff"), cliff_diff);
+    telemetry::send(F("infrared:rock"), infrared::test_detect_rock());
+    telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
     delay(100);
 
