@@ -69,6 +69,7 @@ void loop() {
     telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
     delay(100);
+    
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
 
@@ -115,28 +116,6 @@ void loop() {
     //     }
     // }
 
-    // // Call into command service routines if a command has been received
-    // telemetry::command::process_command();
-
-    // uint16_t test = infrared::test_raw();
-    // float voltage = ((float)test / (float)(1 << 10)) * 5.0;
-    // telemetry::send(F("infrared:test"), test);
-    // telemetry::send(F("infrared:voltage"), voltage);
-
-    // int16_t rock_diff, cliff_diff;
-    // telemetry::send(F("infrared:rock"),
-    //                 infrared::test_detect_rock(&rock_diff));
-    // telemetry::send(F("infrared:cliff"),
-    //                 infrared::test_detect_cliff(&cliff_diff));
-    // telemetry::send(F("infrared:rock.diff"), rock_diff);
-    // telemetry::send(F("infrared:cliff.diff"), cliff_diff);
-
-    // delay(100);
-
-    // for (float speed = -1.0f; speed <= 1.0f; speed += 0.1f) {
-    //     motor::drive_straight(speed, 0);
-    // }
-
     // motor::point_ultrasonic(heading);
 
     // // uint16_t distance = ultrasonic::distance();
@@ -157,5 +136,4 @@ void loop() {
     // }
 
     // heading += step;
-    // telemetry::send(F)
 }
