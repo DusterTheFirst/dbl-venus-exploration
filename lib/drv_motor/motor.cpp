@@ -17,6 +17,38 @@
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
+motor::Movement movementHistory[20];
+int index = 0;
+
+void motor::pushHistory(Movement movement) {
+    movementHistory[index++] = movement;
+}
+
+motor::Movement motor::popHistory() {
+    return movementHistory[--index];
+}
+
+motor::Movement motor::getOppositeMovement(Movement movement) {
+    Movement oppositeMovement;
+    if (movement.degrees != 0) {
+        oppositeMovement.direction = movement.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+        oppositeMovement.degrees = movement.degrees;
+        oppositeMovement.speed = 0;
+        oppositeMovement.time = 0;
+    } else {
+        oppositeMovement.speed = 3000 - movement.speed;
+        oppositeMovement.time = movement.time;
+        oppositeMovement.degrees = 0;
+        oppositeMovement.direction = Direction::LEFT;
+    }
+
+    return oppositeMovement;
+}
+
+int motor::getIndex() {
+    return index;
+}
+
 void motor::init() {
     grabberServo.attach(GRABBER_PIN);
     grabberServo.write(GRABBER_DEGREES_CLOSED);
@@ -104,12 +136,23 @@ int16_t interpolation(float motorSpeed) {
 }
 
 void motor::drive_straight(float speed, int time) {
+
+    start_motor();
     telemetry::send(F("motor:drive_speed"), speed);
     int interpolated_speed = interpolation(speed);
 
-    telemetry::send(F("motor:drive_micros"), interpolated_speed);
-    servoLeft.writeMicroseconds(interpolated_speed);
-    servoRight.writeMicroseconds(interpolated_speed);
+    long start = millis();
+    while (millis() - start <= time) {
+
+        // telemetry::send(F("motor:drive_micros"), interpolated_speed);
+        // servoLeft.writeMicroseconds(interpolated_speed);
+        // servoRight.writeMicroseconds(3000 - interpolated_speed);
+        telemetry::send(F("motor:drive_micros"), speed);
+        servoLeft.writeMicroseconds(3000 - speed);
+        servoRight.writeMicroseconds(speed);
+    }
+
+    stop_motor();
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {
