@@ -31,11 +31,11 @@ motor::Movement motor::popHistory() {
 motor::Movement motor::getOppositeMovement(Movement movement) {
     Movement oppositeMovement;
     if (movement.type == movement.ROTATION) {
-        oppositeMovement.value.direction = movement.value.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
-        oppositeMovement.value.degrees = movement.value.degrees;
+        oppositeMovement.value.rotation.direction = movement.value.rotation.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+        oppositeMovement.value.rotation.degrees = movement.value.rotation.degrees;
     } else if (movement.type == movement.FORWARD) {
-        oppositeMovement.value.speed = 3000 - movement.value.speed;
-        oppositeMovement.value.time = movement.value.time;
+        oppositeMovement.value.forward.speed = 3000 - movement.value.forward.speed;
+        oppositeMovement.value.forward.time = movement.value.forward.time;
     }
     oppositeMovement.type = movement.type;
 
@@ -132,11 +132,11 @@ int16_t interpolation(float motorSpeed) {
                (linearValueHigh - linearValueLow);
 }
 
-void motor::drive_straight(float speed, int time) {
+void motor::drive_straight(int speed, uint32_t time) {
 
     start_motor();
     telemetry::send(F("motor:drive_speed"), speed);
-    int interpolated_speed = interpolation(speed);
+    // int interpolated_speed = interpolation(speed);
 
     long start = millis();
     while (millis() - start <= time) {
@@ -144,7 +144,7 @@ void motor::drive_straight(float speed, int time) {
         // telemetry::send(F("motor:drive_micros"), interpolated_speed);
         // servoLeft.writeMicroseconds(interpolated_speed);
         // servoRight.writeMicroseconds(3000 - interpolated_speed);
-        telemetry::send(F("motor:drive_micros"), speed);
+        // telemetry::send(F("motor:drive_micros"), speed);
         servoLeft.writeMicroseconds(3000 - speed);
         servoRight.writeMicroseconds(speed);
     }
@@ -192,7 +192,7 @@ void motor::rotate_robot(uint8_t degrees, Direction direction) {
 
         current_acute = gyro::get_acute_angle(current_angle_mod,
                                               destination_angle_mod);
-        telemetry::send(F("motor:current_angle"), current_angle_mod);
+        // telemetry::send(F("motor:current_angle"), current_angle_mod);
 
         motor::turn_direction(direction);
 

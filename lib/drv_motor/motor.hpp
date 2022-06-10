@@ -49,22 +49,31 @@ namespace motor {
 
     struct Movement {
         enum MovementType { FORWARD,
-                            ROTATION } type;
+                            ROTATION };
+
+        MovementType type;
+        struct Forward {
+            uint32_t time;
+            int speed;
+        };
+
+        struct Rotation {
+            Direction direction;
+            int degrees;
+        };
 
         union {
-            Direction direction;
-            int speed;
-            int degrees;
-            float time;
+            struct Forward forward;
+            struct Rotation rotation;
         } value;
 
         inline void send() {
             if (MovementType::ROTATION == type) {
-                telemetry::send(F("movement:degrees"), value.degrees);
-                telemetry::send(F("movement:direction_left"), value.direction == Direction::LEFT ? 1 : 0);
+                telemetry::send(F("movement:degrees"), value.rotation.degrees);
+                telemetry::send(F("movement:direction_left"), value.rotation.direction == Direction::LEFT ? 1 : 0);
             } else {
-                telemetry::send(F("movement:speed"), value.speed);
-                telemetry::send(F("movement:time"), value.time);
+                telemetry::send(F("movement:speed"), value.forward.speed);
+                telemetry::send(F("movement:time"), value.forward.time);
             }
         }
     };
@@ -87,7 +96,7 @@ namespace motor {
      * The closer the value is to 0 from both sides, the slower the motor rotates.
      * A value of 0 means that the motor stops.
      */
-    void drive_straight(float speed, int time);
+    void drive_straight(int speed, uint32_t time);
 
     struct MotorPositions {
         float left;
