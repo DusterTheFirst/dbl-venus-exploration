@@ -69,52 +69,49 @@ void loop() {
     telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
     delay(100);
-    
+
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
 
-    // if (time::is_before(5000) && !turnedOnce) {
-    //     motor::drive_straight(1450, 2000);
-    //     motor::Movement movement;
-    //     movement.speed = 1450;
-    //     movement.time = 2000;
-    //     motor::pushHistory(movement);
+    if (time::is_before(5000) && !turnedOnce) {
+        motor::drive_straight(1450, 2000);
+        motor::Movement movement;
+        movement.type = movement.FORWARD;
+        movement.value.speed = 1450;
+        movement.value.time = 2000;
+        motor::pushHistory(movement);
 
-    //     motor::rotate_robot(50, motor::Direction::RIGHT);
-    //     movement.direction = motor::Direction::RIGHT;
-    //     movement.degrees = 50;
-    //     motor::pushHistory(movement);
-    //     movement.send();
-    //     turnedOnce = true;
-    //     if (motor::getIndex() >= 1) {
-    //         motor::getOppositeMovement(motor::popHistory()).send();
-    //     }
-    // }
-    // if (time::is_after(10000)) {
-    //     // telemetry::send(F("history"), true);
-    //     if (motor::getIndex() >= 1) {
-    //         motor::Movement movement = motor::getOppositeMovement(motor::popHistory());
-    //         telemetry::send(F("motor:degrees_rotation_after"), movement.degrees);
-    //         if (movement.degrees != 0) {
-    //             motor::rotate_robot(movement.degrees, movement.direction);
-    //         } else {
-    //             motor::drive_straight(movement.speed, movement.time);
-    //         }
-    //     }
-    // }
-    // else if (time::is_after(5000) && time::is_before(8000) && turnedOnce) {
-    //     // telemetry::send(F("motor:rotation_angle"), 69);
-    //     motor::rotate_robot(140, motor::Direction::LEFT);
-    //     motor::Movement movement;
-    //     movement.direction = motor::Direction::LEFT;
-    //     movement.degrees = 140;
-    //     motor::pushHistory(movement);
-    //     movement.send();
-    //     turnedOnce = false;
-    //     if (motor::getIndex() >= 1) {
-    //         motor::getOppositeMovement(motor::popHistory()).send();
-    //     }
-    // }
+        motor::rotate_robot(50, motor::Direction::RIGHT);
+        movement.type = movement.ROTATION;
+        movement.value.direction = motor::Direction::RIGHT;
+        movement.value.degrees = 50;
+        motor::pushHistory(movement);
+        movement.send();
+        turnedOnce = true;
+    } else if (time::is_after(5000) && time::is_before(8000) && turnedOnce) {
+        // telemetry::send(F("motor:rotation_angle"), 69);
+        motor::rotate_robot(140, motor::Direction::LEFT);
+        motor::Movement movement;
+        movement.type = movement.ROTATION;
+        movement.value.direction = motor::Direction::LEFT;
+        movement.value.degrees = 140;
+        motor::pushHistory(movement);
+        movement.send();
+        turnedOnce = false;
+    }
+
+    if (time::is_after(11000)) {
+        // telemetry::send(F("history"), true);
+        if (motor::getIndex() >= 1) {
+            motor::Movement movement = motor::getOppositeMovement(motor::popHistory());
+            // telemetry::send(F("motor:degrees_rotation_after"), movement.degrees);
+            if (movement.type == movement.ROTATION) {
+                motor::rotate_robot(movement.value.degrees, movement.value.direction);
+            } else if (movement.type == movement.FORWARD) {
+                motor::drive_straight(movement.value.speed, movement.value.time);
+            }
+        }
+    }
 
     // motor::point_ultrasonic(heading);
 

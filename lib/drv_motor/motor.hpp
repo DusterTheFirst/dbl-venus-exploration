@@ -33,17 +33,39 @@ namespace motor {
     enum class GrabberPosition { OPEN,
                                  CLOSED };
 
+    // struct Movement {
+    //     motor::Direction direction;
+    //     uint8_t degrees = 0;
+    //     float time;
+    //     int speed;
+
+    //     inline void send() {
+    //         telemetry::send(F("movement:degrees"), this->degrees);
+    //         telemetry::send(F("movement:direction_left"), this->direction == Direction::LEFT ? 1 : 0);
+    //         // telemetry::send(F("movement:degrees"), this->degrees);
+    //         // telemetry::send(F("movement:degrees"), this->degrees);
+    //     }
+    // };
+
     struct Movement {
-        motor::Direction direction;
-        uint8_t degrees = 0;
-        float time;
-        int speed;
+        enum MovementType { FORWARD,
+                            ROTATION } type;
+
+        union {
+            Direction direction;
+            int speed;
+            int degrees;
+            float time;
+        } value;
 
         inline void send() {
-            telemetry::send(F("movement:degrees"), this->degrees);
-            telemetry::send(F("movement:direction_left"), this->direction == Direction::LEFT ? 1 : 0);
-            // telemetry::send(F("movement:degrees"), this->degrees);
-            // telemetry::send(F("movement:degrees"), this->degrees);
+            if (MovementType::ROTATION == type) {
+                telemetry::send(F("movement:degrees"), value.degrees);
+                telemetry::send(F("movement:direction_left"), value.direction == Direction::LEFT ? 1 : 0);
+            } else {
+                telemetry::send(F("movement:speed"), value.speed);
+                telemetry::send(F("movement:time"), value.time);
+            }
         }
     };
 
@@ -53,7 +75,8 @@ namespace motor {
      * @param position The state that the grabber should be in after this actuation
      *
      */
-    void actuate_grabber(GrabberPosition position);
+    void
+    actuate_grabber(GrabberPosition position);
 
     /**
      * @brief Drive the robot with the specified speed

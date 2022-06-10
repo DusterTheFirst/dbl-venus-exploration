@@ -30,17 +30,14 @@ motor::Movement motor::popHistory() {
 
 motor::Movement motor::getOppositeMovement(Movement movement) {
     Movement oppositeMovement;
-    if (movement.degrees != 0) {
-        oppositeMovement.direction = movement.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
-        oppositeMovement.degrees = movement.degrees;
-        oppositeMovement.speed = 0;
-        oppositeMovement.time = 0;
-    } else {
-        oppositeMovement.speed = 3000 - movement.speed;
-        oppositeMovement.time = movement.time;
-        oppositeMovement.degrees = 0;
-        oppositeMovement.direction = Direction::LEFT;
+    if (movement.type == movement.ROTATION) {
+        oppositeMovement.value.direction = movement.value.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+        oppositeMovement.value.degrees = movement.value.degrees;
+    } else if (movement.type == movement.FORWARD) {
+        oppositeMovement.value.speed = 3000 - movement.value.speed;
+        oppositeMovement.value.time = movement.value.time;
     }
+    oppositeMovement.type = movement.type;
 
     return oppositeMovement;
 }
