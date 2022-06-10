@@ -65,12 +65,6 @@ bool infrared::test_detect_rock(void) {
     bool above_ambient = reference > ambient;
 
     uint16_t reading = infrared::test_raw();
-    uint16_t reading_ambient_diff;
-    if (above_ambient) {
-        reading_ambient_diff = reading - ambient;
-    } else {
-        reading_ambient_diff = ambient - reading;
-    }
 
     uint16_t quartile_width = (max(reference, ambient) -
                                min(reference, ambient)) /
