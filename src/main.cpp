@@ -68,27 +68,40 @@ void loop() {
     // telemetry::send(F("infrared:rock"), infrared::test_detect_rock());
     // telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
-    delay(100);
+    delay(200);
+
+    // telemetry::send(F("history"), true);
+    //   motor::rotate_robot(50, motor::Direction::RIGHT);
 
     if (time::is_before(5000) && !turnedOnce) {
         motor::drive_straight(1450, 2000);
         motor::Movement movement;
-        movement.speed = 1450;
-        movement.time = 2000;
+        motor::Movement::Forward forward;
+        forward.speed = 1450;
+        forward.time = 2000;
+        movement.type = movement.FORWARD;
+        movement.value.forward = forward;
         motor::pushHistory(movement);
 
+        motor::Movement movement2;
         motor::rotate_robot(50, motor::Direction::RIGHT);
-        movement.direction = motor::Direction::RIGHT;
-        movement.degrees = 50;
-        motor::pushHistory(movement);
-        movement.send();
+        motor::Movement::Rotation rotation;
+        movement2.type = movement2.ROTATION;
+        rotation.direction = motor::Direction::RIGHT;
+        rotation.degrees = 50;
+        movement2.value.rotation = rotation;
+        motor::pushHistory(movement2);
+        movement2.send();
         turnedOnce = true;
     } else if (time::is_after(5000) && time::is_before(8000) && turnedOnce) {
         // telemetry::send(F("motor:rotation_angle"), 69);
         motor::rotate_robot(140, motor::Direction::LEFT);
         motor::Movement movement;
-        movement.direction = motor::Direction::LEFT;
-        movement.degrees = 140;
+        motor::Movement::Rotation rotation;
+        movement.type = movement.ROTATION;
+        rotation.direction = motor::Direction::LEFT;
+        rotation.degrees = 140;
+        movement.value.rotation = rotation;
         motor::pushHistory(movement);
         movement.send();
         turnedOnce = false;
@@ -98,14 +111,15 @@ void loop() {
         // telemetry::send(F("history"), true);
         if (motor::getIndex() >= 1) {
             motor::Movement movement = motor::getOppositeMovement(motor::popHistory());
-            telemetry::send(F("motor:degrees_rotation_after"), movement.degrees);
-            if (movement.degrees != 0) {
-                motor::rotate_robot(movement.degrees, movement.direction);
-            } else {
-                motor::drive_straight(movement.speed, movement.time);
+            if (movement.type == movement.ROTATION) {
+                telemetry::send(F("motor:degrees_rotation_after"), movement.value.rotation.degrees);
+                motor::rotate_robot(movement.value.rotation.degrees, movement.value.rotation.direction);
+            } else if (movement.type == movement.FORWARD) {
+                motor::drive_straight(movement.value.forward.speed, movement.value.forward.time);
             }
         }
     }
+
     // motor::point_ultrasonic(heading);
 
     // // uint16_t distance = ultrasonic::distance();
