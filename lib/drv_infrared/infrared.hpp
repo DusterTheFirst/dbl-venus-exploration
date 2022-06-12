@@ -16,6 +16,7 @@ namespace infrared {
     void init(void);
 
     uint16_t test_raw(void);
+
     bool test_detect_rock(void);
     bool test_detect_cliff(void);
 

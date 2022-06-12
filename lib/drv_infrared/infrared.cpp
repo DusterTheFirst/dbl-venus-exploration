@@ -15,6 +15,55 @@
 struct Calibration {
     uint16_t reference;
     uint16_t ambient;
+
+    inline uint16_t quartile_width() {
+        return (max(reference, ambient) - min(reference, ambient)) / 4;
+    }
+
+    inline bool above_ambient() {
+        return reference > ambient;
+    }
+
+    inline uint16_t on_thresh() {
+        if (this->above_ambient()) {
+            return ambient + this->quartile_width() * 3;
+        } else {
+            return ambient - this->quartile_width() * 3;
+        }
+    }
+
+    inline uint16_t off_thresh() {
+        if (this->above_ambient()) {
+            return ambient + this->quartile_width() * 2;
+        } else {
+            return ambient - this->quartile_width() * 2;
+        }
+    }
+
+    inline bool test(uint16_t reading) {
+        static bool previous_state = false;
+
+        // Schmitt Trigger
+        if (previous_state) {
+            // Check if crossed off threshold
+            if ((this->above_ambient() && reading < this->off_thresh()) ||
+                (!this->above_ambient() && reading > this->off_thresh())) {
+                previous_state = false;
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            // Check if crossed on threshold
+            if ((this->above_ambient() && reading > this->on_thresh()) ||
+                (!this->above_ambient() && reading < this->on_thresh())) {
+                previous_state = true;
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
 };
 
 struct IRCalibration {
@@ -62,49 +111,13 @@ bool infrared::test_detect_rock(void) {
     telemetry::send(F("infrared:calibration.reference"), reference);
     telemetry::send(F("infrared:calibration.ambient"), ambient);
 
-    bool above_ambient = reference > ambient;
-
-    uint16_t reading = infrared::test_raw();
-
-    uint16_t quartile_width = (max(reference, ambient) -
-                               min(reference, ambient)) /
-                              4;
-
-    uint16_t on_thresh;
-    uint16_t off_thresh;
-    if (above_ambient) {
-        on_thresh = ambient + quartile_width * 3;
-        off_thresh = ambient + quartile_width * 2;
-    } else {
-        on_thresh = ambient - quartile_width * 3;
-        off_thresh = ambient - quartile_width * 2;
-    }
+    uint16_t on_thresh = calibration.rock.on_thresh();
+    uint16_t off_thresh = calibration.rock.off_thresh();
 
     telemetry::send(F("infrared:test.on_thresh"), on_thresh);
     telemetry::send(F("infrared:test.off_thresh"), off_thresh);
 
-    static bool previous_state = false;
-
-    // Schmidt Trigger
-    if (previous_state) {
-        // Check if crossed off threshold
-        if ((above_ambient && reading < off_thresh) ||
-            (!above_ambient && reading > off_thresh)) {
-            previous_state = false;
-            return false;
-        } else {
-            return true;
-        }
-    } else {
-        // Check if crossed on threshold
-        if ((above_ambient && reading > on_thresh) ||
-            (!above_ambient && reading < on_thresh)) {
-            previous_state = true;
-            return true;
-        } else {
-            return false;
-        }
-    }
+    return calibration.rock.test(infrared::test_raw());
 }
 
 bool infrared::test_detect_cliff(void) {
