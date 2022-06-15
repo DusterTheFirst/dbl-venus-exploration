@@ -184,7 +184,7 @@ void motor::drive_straight_a(int16_t speed, uint32_t time) {
         else if (infared::test_detect_cliff() ) {
 
         }
-        else if (ultrasonic::distance() < 7) {
+        else if (ultrasonic::distance() < 10) {
             end_condition = 5;
             break;
         } 
