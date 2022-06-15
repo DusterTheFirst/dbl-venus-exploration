@@ -103,6 +103,11 @@ namespace motor {
     void return_to_lab_move();
     void return_to_lab_rotate();
 
+    // Backward
+    // To Left (Right detected only)
+    // To Right (Left detected only)
+    int8_t rotate_to_random(int8_t where_to);
+
     /**
      * @brief Rotate the robot in place, relative to its current heading
      *

@@ -68,11 +68,12 @@ void loop() {
     // telemetry::send(F("infrared:rock"), infrared::test_detect_rock());
     // telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
-    delay(200);
+    //delay(200);
 
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
 
+    /*
     if (time::is_before(5000) && !turnedOnce) {
         motor::drive_straight(1450, 2000);
         motor::Movement movement;
@@ -119,7 +120,7 @@ void loop() {
             }
         }
     }
-
+    */
     // motor::point_ultrasonic(heading);
 
     // // uint16_t distance = ultrasonic::distance();
@@ -140,4 +141,5 @@ void loop() {
     // }
 
     // heading += step;
+    
 }
