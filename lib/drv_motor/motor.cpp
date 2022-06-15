@@ -17,6 +17,9 @@
 
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
+// 1475 and 1440 respectively
+const float SERVO_VEL[2] = {0.0415, 0.1172};
+
 motor::Movement movementHistory[20];
 int index = 0;
 
@@ -152,6 +155,74 @@ void motor::drive_straight(int speed, uint32_t time) {
     stop_motor();
 }
 
+// Send -1 for no time
+void motor::drive_straight_a(int16_t speed, uint32_t time) {
+    Movement ret;
+    ret.type = FORWARD;
+    ret.value.forward.speed = speed;
+
+    servoLeft.attach(SERVO_LEFT_PIN);
+    servoRight.attach(SERVO_RIGHT_PIN);
+
+        /* 0 - Default
+     * 1 - Rock
+     * 2 - Left cliff
+     * 3 - Right cliff
+     * 4 - Forward cliff
+     * 5 - Ultrasound
+     */
+    uint8_t end_condition = 0;
+    uint32_t start_time = millis()
+    uint32_t end_time;
+
+    while (end_time <= time) {
+        end_time = millis() - start_time();
+        if (infared::test_detect_rock() {
+            end_condition = 1;
+            break;
+        }
+        else if (infared::test_detect_cliff() ) {
+
+        }
+        else if (ultrasonic::distance() < 7) {
+            end_condition = 5;
+            break;
+        } 
+    }
+    ret.value.forward.time = end_time;
+    pushHistory(ret);
+
+    switch(end_condition) {
+        case 1:
+            actuate_grabber(GrabberPosition::OPEN);
+            // Align to rock
+            actuate_grabber(GrabberPosition::CLOSED); 
+            return_to_lab_move();
+            break;
+        case 2:
+        default:
+            break;
+    }
+}
+
+void return_to_lab_move() {
+    Movement last_rev = getOppositeMovement(popHistory());
+    if (index == 0) return;
+    else {
+        drive_straight_a(last_rev.value.forward.speed, last_rev.value.forward.time);
+        return_to_lab_rotate();
+    }
+}
+
+void return_to_lab_rotate() {
+    Movement last_rev = getOppositeRotation(popHistory());
+    if (index == 0) return;
+    else {
+        rotate_robot (last_rev.value.rotation.degrees, last_rev.value.rotation.direction);
+        return_to_lab_move();
+    }
+} 
+
 bool rotation_destination_reached(int previous_angle, int current_angle) {
     return previous_angle < current_angle || current_angle <= 3;
 }
@@ -250,16 +321,4 @@ void motor::point_ultrasonic(int8_t heading) {
     ultrasonicServo.write(servo_command);
 
     delay(diff * 5);
-}
-
-motor::MotorPositions motor::get_motor_positions() {
-    // TODO: using an interrupt or somthing, keep track of the motor position
-    // reported by the rotary encoders
-
-    return {
-        .left = 0.0, // TODO: Replace these constants with the actual calculated
-                     // values. These exist just to show how you would construct
-                     // the MotorPositions structure
-        .right = 0.0
-    };
 }

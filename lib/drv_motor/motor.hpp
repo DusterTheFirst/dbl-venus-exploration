@@ -84,8 +84,7 @@ namespace motor {
      * @param position The state that the grabber should be in after this actuation
      *
      */
-    void
-    actuate_grabber(GrabberPosition position);
+    void actuate_grabber(GrabberPosition position);
 
     /**
      * @brief Drive the robot with the specified speed
@@ -98,17 +97,11 @@ namespace motor {
      */
     void drive_straight(int speed, uint32_t time);
 
-    struct MotorPositions {
-        float left;
-        float right;
-    };
+    // Speeds: 1440, 1475
+    void drive_straight_a(int16_t speed, uint32_t time);
 
-    /**
-     * @brief Get the current motor positions
-     *
-     * @return Structure representing the positions of the motors
-     */
-    MotorPositions get_motor_positions();
+    void return_to_lab_move();
+    void return_to_lab_rotate();
 
     /**
      * @brief Rotate the robot in place, relative to its current heading

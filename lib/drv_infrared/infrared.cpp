@@ -120,6 +120,7 @@ bool infrared::test_detect_rock(void) {
     return calibration.rock.test(infrared::test_raw());
 }
 
+// Need to return cliff detection for L/R -> Struct?
 bool infrared::test_detect_cliff(void) {
     return false;
 }
