@@ -157,6 +157,20 @@ void motor::drive_straight(int speed, uint32_t time) {
     stop_motor();
 }
 
+uint8_t get_end_condition() {
+    if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
+        return 1;
+    } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
+        return 4;
+    } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
+        return infrared::detect::cliff_left() ? 2 : 3;
+    } else if (ultrasonic::distance() < 18) {
+        return 5;
+    }
+
+    return 0;
+}
+
 // Send -1 for no time
 void motor::drive_straight(int16_t speed) {
     Movement ret;
@@ -180,26 +194,22 @@ void motor::drive_straight(int16_t speed) {
     uint32_t end_time;
 
     while (true) {
-        end_time = millis() - start_time;
-        if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
-            end_condition = 1;
-            break;
-        } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
-            end_condition = 4;
-            break;
-        } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
-            end_condition = infrared::detect::cliff_left() ? 2 : 3;
-        } else if (ultrasonic::distance() < 18) {
-            end_condition = 5;
+
+        end_condition = get_end_condition();
+
+        if (end_condition != 0) {
             break;
         }
     }
-    start_time = millis();
+
+    end_time = millis() - start_time;
     ret.value.forward.time = end_time;
+    start_time = millis();
     push_history(ret);
 
     if (end_condition == 1) {
         stop_motor();
+        actuate_grabber(GrabberPosition::OPEN);
         delay(1000);
         // Align to rock
         servo_left.attach(SERVO_LEFT_PIN);
@@ -211,12 +221,10 @@ void motor::drive_straight(int16_t speed) {
         motor::RotatedTo ret2;
         ret.type = ret.ROTATION;
         if (end_condition <= 3) {
+            delay(500);
             end_time = millis() - start_time;
-            while (end_time < 500) {
-                end_time = millis() - start_time;
-            }
             stop_motor();
-            delay(1000);
+            delay(200);
             if (end_condition == 2 && !(infrared::detect::cliff_right())) {
                 ret2 = rotate_to_random(2);
             } else if (end_condition == 3 && !(infrared::detect::cliff_left())) {
@@ -232,11 +240,12 @@ void motor::drive_straight(int16_t speed) {
         ret.value.rotation.direction = ret2.direction;
         push_history(ret);
     }
-    delay(1000);
+    delay(200);
 }
 
 void motor::return_to_lab_move() {
     Movement last_rev = get_opposite_movement(pop_history());
+    delay(200);
     if (index == 0)
         return;
     else {
@@ -247,6 +256,7 @@ void motor::return_to_lab_move() {
 
 void motor::return_to_lab_rotate() {
     Movement last_rev = get_opposite_movement(pop_history());
+    delay(200);
     if (index == 0)
         return;
     else {
@@ -260,10 +270,7 @@ motor::RotatedTo motor::rotate_to_random(int8_t where_to) {
     switch (where_to) {
         case 0:
             rotate_to.degrees = random(BACKWARD_TURN_LB, BACKWARD_TURN_RB);
-            if (random(2))
-                rotate_to.direction = motor::Direction::LEFT;
-            else
-                rotate_to.direction = motor::Direction::RIGHT;
+            rotate_to.direction = random(2) ? motor::Direction::LEFT : rotate_to.direction = motor::Direction::RIGHT;
             break;
         case 1:
             rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
