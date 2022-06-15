@@ -166,7 +166,7 @@ void motor::drive_straight(int16_t speed) {
     start_motor();
 
     servoLeft.write(speed);
-    servoRight.write(3000-speed);
+    servoRight.write(3000 - speed);
 
     /* 0 - Default
      * 1 - Rock
@@ -184,34 +184,30 @@ void motor::drive_straight(int16_t speed) {
         if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
             end_condition = 1;
             break;
-        }
-        else if(infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
+        } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
             end_condition = 4;
             break;
-        }
-        else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
+        } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
             end_condition = infrared::detect::cliff_left() ? 2 : 3;
-        }
-        else if (ultrasonic::distance() < 18) {
+        } else if (ultrasonic::distance() < 18) {
             end_condition = 5;
             break;
         }
     }
-    start_time = millis();  
+    start_time = millis();
     ret.value.forward.time = end_time;
     pushHistory(ret);
 
     if (end_condition == 1) {
-            stop_motor();
-            delay(1000);
-            // Align to rock
-            servoLeft.attach(SERVO_LEFT_PIN);
-            servoRight.attach(SERVO_RIGHT_PIN);
-            // Align to rock cont...
-            actuate_grabber(GrabberPosition::CLOSED);
-            return_to_lab_move();
-    }
-    else {
+        stop_motor();
+        delay(1000);
+        // Align to rock
+        servoLeft.attach(SERVO_LEFT_PIN);
+        servoRight.attach(SERVO_RIGHT_PIN);
+        // Align to rock cont...
+        actuate_grabber(GrabberPosition::CLOSED);
+        return_to_lab_move();
+    } else {
         motor::RotatedTo ret2;
         ret.type = ret.ROTATION;
         if (end_condition <= 3) {
@@ -221,17 +217,14 @@ void motor::drive_straight(int16_t speed) {
             }
             stop_motor();
             delay(1000);
-            if (end_condition == 2 && !(nfrared::detect::cliff_right())) {
+            if (end_condition == 2 && !(infrared::detect::cliff_right())) {
                 ret2 = rotate_to_random(2);
-            }
-            else if (end_condition == 3 && !(infrared::detect::cliff_left())) {
-                ret2 = rotate_to_random(1)
-            }
-            else {
+            } else if (end_condition == 3 && !(infrared::detect::cliff_left())) {
+                ret2 = rotate_to_random(1);
+            } else {
                 ret2 = rotate_to_random(0);
             }
-        }   
-        else {
+        } else {
             stop_motor();
             ret2 = rotate_to_random(0);
         }
@@ -264,11 +257,13 @@ void motor::return_to_lab_rotate() {
 
 motor::RotatedTo motor::rotate_to_random(int8_t where_to) {
     motor::RotatedTo rotate_to;
-    switch(where_to) {
+    switch (where_to) {
         case 0:
             rotate_to.degrees = random(BACKWARD_TURN_LB, BACKWARD_TURN_RB);
-            if (random(2)) rotate_to.direction = motor::Direction::LEFT;
-            else rotate_to.direction = motor::Direction::RIGHT;
+            if (random(2))
+                rotate_to.direction = motor::Direction::LEFT;
+            else
+                rotate_to.direction = motor::Direction::RIGHT;
             break;
         case 1:
             rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
