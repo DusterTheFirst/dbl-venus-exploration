@@ -22,7 +22,7 @@
 Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
 
 // 1475 and 1440 respectively
-const float SERVO_VEL[2] = {0.0415, 0.1172};
+const float SERVO_VEL[2] = { 0.0415, 0.1172 };
 
 /*
 std::default_random_engine dre_gen;
@@ -175,7 +175,7 @@ void motor::drive_straight_a(int16_t speed, uint32_t time) {
     servoLeft.attach(SERVO_LEFT_PIN);
     servoRight.attach(SERVO_RIGHT_PIN);
 
-        /* 0 - Default
+    /* 0 - Default
      * 1 - Rock
      * 2 - Left cliff
      * 3 - Right cliff
@@ -188,30 +188,30 @@ void motor::drive_straight_a(int16_t speed, uint32_t time) {
 
     while (end_time <= time) {
         end_time = millis() - start_time;
-        if (infrared::test_detect_rock()) {
+        if (infrared::detect::rock_left() ||
+            infrared::detect::rock_right()) {
             end_condition = 1;
             break;
-        }
-        else if (infrared::test_detect_cliff() ) {
+        } else if (infrared::detect::cliff_left() ||
+                   infrared::detect::cliff_right()) {
 
-        }
-        else if (ultrasonic::distance() < 18) {
+        } else if (ultrasonic::distance() < 18) {
             end_condition = 5;
             break;
-        } 
+        }
     }
     stop_motor();
     ret.value.forward.time = end_time;
     pushHistory(ret);
 
-    switch(end_condition) {
+    switch (end_condition) {
         case 1:
             actuate_grabber(GrabberPosition::OPEN);
             // Align to rock
             servoLeft.attach(SERVO_LEFT_PIN);
-            servoRight.attach(SERVO_RIGHT_PIN);     
+            servoRight.attach(SERVO_RIGHT_PIN);
             // Align to rock cont...
-            actuate_grabber(GrabberPosition::CLOSED); 
+            actuate_grabber(GrabberPosition::CLOSED);
             return_to_lab_move();
             break;
         case 2:
@@ -222,7 +222,8 @@ void motor::drive_straight_a(int16_t speed, uint32_t time) {
 
 void motor::return_to_lab_move() {
     Movement last_rev = getOppositeMovement(popHistory());
-    if (index == 0) return;
+    if (index == 0)
+        return;
     else {
         drive_straight_a(last_rev.value.forward.speed, last_rev.value.forward.time);
         return_to_lab_rotate();
@@ -231,15 +232,15 @@ void motor::return_to_lab_move() {
 
 void motor::return_to_lab_rotate() {
     Movement last_rev = getOppositeMovement(popHistory());
-    if (index == 0) return;
+    if (index == 0)
+        return;
     else {
-        rotate_robot (last_rev.value.rotation.degrees, last_rev.value.rotation.direction);
+        rotate_robot(last_rev.value.rotation.degrees, last_rev.value.rotation.direction);
         return_to_lab_move();
     }
-} 
+}
 
 int8_t motor::rotate_to_random(int8_t where_to) {
-    
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

@@ -4,11 +4,11 @@
 #include <infrared.hpp>
 #include <telemetry.hpp>
 
-#define CLIFF_SENSOR_1 A5
-#define CLIFF_SENSOR_2 A4
+#define CLIFF_SENSOR_RIGHT A3
+#define CLIFF_SENSOR_LEFT A1
 
-#define ROCK_SENSOR_1 A2
-#define ROCK_SENSOR_2 A1
+#define ROCK_SENSOR_RIGHT A2
+#define ROCK_SENSOR_LEFT A0
 
 #define CALIBRATION_ADDRESS 0
 
@@ -69,6 +69,18 @@ struct Calibration {
 struct IRCalibration {
     Calibration cliff;
     Calibration rock;
+
+    inline void debug(void) {
+        telemetry::send(F("infrared:cliff.ambient"), cliff.ambient);
+        telemetry::send(F("infrared:cliff.reference"), cliff.reference);
+        telemetry::send(F("infrared:cliff.on_thresh"), cliff.on_thresh());
+        telemetry::send(F("infrared:cliff.off_thresh"), cliff.off_thresh());
+
+        telemetry::send(F("infrared:rock.on_thresh"), rock.ambient);
+        telemetry::send(F("infrared:rock.off_thresh"), rock.reference);
+        telemetry::send(F("infrared:rock.on_thresh"), rock.on_thresh());
+        telemetry::send(F("infrared:rock.off_thresh"), rock.off_thresh());
+    }
 };
 
 static IRCalibration calibration;
@@ -77,122 +89,135 @@ void load_calibration(void) {
     // Load calibration data from the EEPROM
     EEPROM.get(CALIBRATION_ADDRESS, calibration);
 
-    telemetry::send_arr(F("infrared:calibration"), (uint16_t *)&calibration,
-                        sizeof(calibration) / sizeof(uint16_t));
+    calibration.debug();
 }
 
 void store_calibration(void) {
-    telemetry::send_arr(F("infrared:calibration"), (uint16_t *)&calibration,
-                        sizeof(calibration) / sizeof(uint16_t));
-
     // Store calibration data into the EEPROM
     EEPROM.put(CALIBRATION_ADDRESS, calibration);
+
+    calibration.debug();
 }
 
-void infrared::init(void) {
-    analogReference(DEFAULT);
+namespace infrared {
+    void init(void) {
+        analogReference(DEFAULT);
 
-    pinMode(CLIFF_SENSOR_1, INPUT);
-    pinMode(CLIFF_SENSOR_2, INPUT);
-    pinMode(ROCK_SENSOR_1, INPUT);
-    pinMode(ROCK_SENSOR_2, INPUT);
+        pinMode(CLIFF_SENSOR_LEFT, INPUT);
+        pinMode(CLIFF_SENSOR_RIGHT, INPUT);
+        pinMode(ROCK_SENSOR_LEFT, INPUT);
+        pinMode(ROCK_SENSOR_RIGHT, INPUT);
 
-    load_calibration();
-}
-
-uint16_t infrared::test_raw(void) {
-    return (uint16_t)analogRead(CLIFF_SENSOR_1);
-}
-
-bool infrared::test_detect_rock(void) {
-    uint16_t reference = calibration.rock.reference;
-    uint16_t ambient = calibration.rock.ambient;
-
-    telemetry::send(F("infrared:calibration.reference"), reference);
-    telemetry::send(F("infrared:calibration.ambient"), ambient);
-
-    uint16_t on_thresh = calibration.rock.on_thresh();
-    uint16_t off_thresh = calibration.rock.off_thresh();
-
-    telemetry::send(F("infrared:test.on_thresh"), on_thresh);
-    telemetry::send(F("infrared:test.off_thresh"), off_thresh);
-
-    return calibration.rock.test(infrared::test_raw());
-}
-
-// Need to return cliff detection for L/R -> Struct?
-bool infrared::test_detect_cliff(void) {
-    return false;
-}
-
-void infrared::calibrate_ambient(void) {
-    telemetry::send(F("infrared:calibrating.ambient"), true);
-
-    // Take an incremental average for an amount of time, and store in EEPROM
-    float average = 0.0;
-    for (uint32_t samples = 1; samples < 65535; samples++) {
-        if (samples % 64 == 0) {
-            telemetry::send(F("infrared:ambient.rock"), average);
-        }
-
-        // https://math.stackexchange.com/questions/106700/incremental-averaging
-        average += ((float)infrared::test_raw() - average) / (float)samples;
-        // TODO: FIXME: compound readings from multiple sensors or save
-        // calibration per sensor
+        load_calibration();
     }
 
-    calibration.rock.ambient = (uint16_t)round(average);
-
-    telemetry::send(F("infrared:calibrating.ambient"), false);
-
-    store_calibration();
-}
-
-void infrared::calibrate_reference(void) {
-    telemetry::send(F("infrared:calibrating.reference"), true);
-
-    // Take an incremental average for an amount of time, and store in EEPROM
-    float average = 0.0;
-    for (uint32_t samples = 1; samples < 65535; samples++) {
-        if (samples % 64 == 0) {
-            telemetry::send(F("infrared:reference.rock"), average);
-        }
-
-        // https://math.stackexchange.com/questions/106700/incremental-averaging
-        average += ((float)infrared::test_raw() - average) / (float)samples;
+    void debug_calibration(void) {
+        calibration.debug();
     }
 
-    calibration.rock.reference = (uint16_t)round(average);
+    namespace raw {
+        uint16_t cliff_left(void) {
+            return (uint16_t)analogRead(CLIFF_SENSOR_LEFT);
+        }
 
-    telemetry::send(F("infrared:calibrating.reference"), false);
+        uint16_t cliff_right(void) {
+            return (uint16_t)analogRead(CLIFF_SENSOR_RIGHT);
+        }
 
-    store_calibration();
-}
+        uint16_t rock_left(void) {
+            return (uint16_t)analogRead(ROCK_SENSOR_LEFT);
+        }
 
-infrared::RobotSides infrared::sees_edge() {
-    // TODO: detect edge on all four sides of the robot
+        uint16_t rock_right(void) {
+            return (uint16_t)analogRead(ROCK_SENSOR_RIGHT);
+        }
+    }
 
-    return {
-        // TODO: Replace these constants with the actual calculated
-        // values. These exist just to show how you would construct
-        // the RobotSides structure
-        .left = false,
-        .right = false,
-        .front = false,
-        .back = false,
-    };
-}
+    namespace detect {
+        bool cliff_left(void) {
+            return calibration.cliff.test(raw::cliff_left());
+        }
 
-infrared::RobotSides infrared::sees_rock() {
-    // TODO: detect rock on all four sides of the robot
+        bool cliff_right(void) {
+            return calibration.cliff.test(raw::cliff_right());
+        }
 
-    return {
-        // TODO: Replace these constants with the actual calculated
-        // values. These exist just to show how you would construct
-        // the RobotSides structure
-        .left = false,
-        .right = false,
-        .front = false,
-        .back = false,
-    };
+        bool rock_left(void) {
+            return calibration.rock.test(raw::rock_left());
+        }
+
+        bool rock_right(void) {
+            return calibration.rock.test(raw::rock_right());
+        }
+    }
+
+    void generic_calibrate(uint16_t *const rock, uint16_t *const cliff) {
+        // Take an incremental average for an amount of time
+        // and store in EEPROM
+        // https://math.stackexchange.com/questions/106700/incremental-averaging
+
+        float rock_average = 0.0;
+        float cliff_average = 0.0;
+        for (uint32_t samples = 1; samples < 65535; samples++) {
+            // Do the rock
+            {
+                uint16_t rock_left_sample = infrared::raw::rock_left();
+                uint16_t rock_right_sample = infrared::raw::rock_right();
+
+                float rock_sample_average = ((float)rock_left_sample +
+                                             (float)rock_right_sample) /
+                                            2.0;
+
+                rock_average += (rock_sample_average - rock_average) /
+                                (float)samples;
+            }
+
+            // Do the cliff
+            {
+                uint16_t cliff_left_sample = infrared::raw::cliff_left();
+                uint16_t cliff_right_sample = infrared::raw::cliff_right();
+
+                float cliff_sample_average = ((float)cliff_left_sample +
+                                              (float)cliff_right_sample) /
+                                             2.0;
+
+                cliff_average += (cliff_sample_average - cliff_average) /
+                                 (float)samples;
+            }
+
+            if (samples % 64 == 0) {
+                telemetry::send(F("infrared:calibrating.rock"),
+                                rock_average);
+                telemetry::send(F("infrared:calibrating.cliff"),
+                                cliff_average);
+            }
+        }
+
+        *rock = (uint16_t)round(rock_average);
+        *cliff = (uint16_t)round(cliff_average);
+    }
+
+    namespace calibrate {
+        void ambient(void) {
+            telemetry::send(F("infrared:calibrating.ambient"), true);
+
+            generic_calibrate(&calibration.rock.ambient,
+                              &calibration.cliff.ambient);
+
+            telemetry::send(F("infrared:calibrating.ambient"), false);
+
+            store_calibration();
+        }
+
+        void reference(void) {
+            telemetry::send(F("infrared:calibrating.reference"), true);
+
+            generic_calibrate(&calibration.rock.reference,
+                              &calibration.cliff.reference);
+
+            telemetry::send(F("infrared:calibrating.reference"), false);
+
+            store_calibration();
+        }
+    }
 }

@@ -15,35 +15,28 @@ namespace infrared {
      */
     void init(void);
 
-    uint16_t test_raw(void);
-
-    bool test_detect_rock(void);
-    bool test_detect_cliff(void);
-
-    void calibrate_ambient(void);
-    void calibrate_reference(void);
+    void debug_calibration(void);
 
     /**
-     * @brief Bitfields defining the different sides of the robot
+     * @brief Raw measurements from the infrared sensors
+     * 
      */
-    struct RobotSides {
-        bool left : 1;
-        bool right : 1;
-        bool front : 1;
-        bool back : 1;
-    };
+    namespace raw {
+        uint16_t rock_left(void);
+        uint16_t rock_right(void);
+        uint16_t cliff_left(void);
+        uint16_t cliff_right(void);
+    }
 
-    /**
-     * @brief Detect presence of a cliff or boundary
-     *
-     * @return A structure describing the edge status of the four sides of the robot
-     */
-    RobotSides sees_edge();
+    namespace detect {
+        bool rock_left(void);
+        bool rock_right(void);
+        bool cliff_left(void);
+        bool cliff_right(void);
+    }
 
-    /**
-     * @brief Detect presence of a rock
-     *
-     * @return A structure describing the rock status of the four sides of the robot
-     */
-    RobotSides sees_rock();
+    namespace calibrate {
+        void ambient(void);
+        void reference(void);
+    }
 }

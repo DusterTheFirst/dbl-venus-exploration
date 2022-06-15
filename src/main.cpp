@@ -25,8 +25,8 @@ void setup() {
     delay(1000);
 
     telemetry::command::load_vector_table({
-        .CalibrateAmbientInfrared = infrared::calibrate_ambient,
-        .CalibrateReferenceInfrared = infrared::calibrate_reference,
+        .CalibrateAmbientInfrared = infrared::calibrate::ambient,
+        .CalibrateReferenceInfrared = infrared::calibrate::reference,
     });
 
     telemetry::send(F("main:initializing"), true);
@@ -140,6 +140,5 @@ void loop() {
     //     step = STEP_BY;
     // }
 
-    // heading += step;
-    
+    // heading += step;   
 }
