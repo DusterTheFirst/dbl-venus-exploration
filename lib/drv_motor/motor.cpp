@@ -24,11 +24,6 @@ Servo servo_left, servo_right, grabber_servo, ultrasonic_servo;
 // 1475 and 1440 respectively
 const float SERVO_VEL[2] = { 0.0415, 0.1172 };
 
-#define BACKWARD_TURN_LB 90
-#define BACKWARD_TURN_RB 180
-#define TURN_MIN_BOUND 20
-#define TURN_MAX_BOUND 160
-
 motor::Movement movement_history[20];
 int index = 0;
 
@@ -72,7 +67,7 @@ void motor::init() {
     servo_right.write(MOTOR_STOP);
 }
 
-void stop_motor() {
+void motor::stop_motor() {
     servo_left.write(MOTOR_STOP);
     servo_left.detach();
 
@@ -80,7 +75,7 @@ void stop_motor() {
     servo_right.detach();
 }
 
-void start_motor() {
+void motor::start_motor() {
     servo_left.write(MOTOR_STOP);
     servo_left.attach(SERVO_LEFT_PIN);
 
@@ -157,134 +152,10 @@ void motor::drive_straight(int speed, uint32_t time) {
     stop_motor();
 }
 
-uint8_t get_end_condition() {
-    if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
-        return 1;
-    } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
-        return 4;
-    } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
-        return infrared::detect::cliff_left() ? 2 : 3;
-    } else if (ultrasonic::distance() < 18) {
-        return 5;
-    }
-
-    return 0;
-}
-
-// Send -1 for no time
-void motor::drive_straight(int16_t speed) {
-    Movement ret;
-    ret.type = ret.FORWARD;
-    ret.value.forward.speed = speed;
-
+void motor::drive_straight(int speed) {
     start_motor();
-
-    servo_left.write(speed);
-    servo_right.write(3000 - speed);
-
-    /* 0 - Default
-     * 1 - Rock
-     * 2 - Left cliff
-     * 3 - Right cliff
-     * 4 - Forward cliff
-     * 5 - Ultrasound
-     */
-    uint8_t end_condition = 0;
-    uint32_t start_time = millis();
-    uint32_t end_time;
-
-    while (true) {
-
-        end_condition = get_end_condition();
-
-        if (end_condition != 0) {
-            break;
-        }
-    }
-
-    end_time = millis() - start_time;
-    ret.value.forward.time = end_time;
-    start_time = millis();
-    push_history(ret);
-
-    if (end_condition == 1) {
-        stop_motor();
-        actuate_grabber(GrabberPosition::OPEN);
-        delay(1000);
-        // Align to rock
-        servo_left.attach(SERVO_LEFT_PIN);
-        servo_right.attach(SERVO_RIGHT_PIN);
-        // Align to rock cont...
-        actuate_grabber(GrabberPosition::CLOSED);
-        return_to_lab_move();
-    } else {
-        motor::RotatedTo ret2;
-        ret.type = ret.ROTATION;
-        if (end_condition <= 3) {
-            delay(500);
-            end_time = millis() - start_time;
-            stop_motor();
-            delay(200);
-            if (end_condition == 2 && !(infrared::detect::cliff_right())) {
-                ret2 = rotate_to_random(2);
-            } else if (end_condition == 3 && !(infrared::detect::cliff_left())) {
-                ret2 = rotate_to_random(1);
-            } else {
-                ret2 = rotate_to_random(0);
-            }
-        } else {
-            stop_motor();
-            ret2 = rotate_to_random(0);
-        }
-        ret.value.rotation.degrees = ret2.degrees;
-        ret.value.rotation.direction = ret2.direction;
-        push_history(ret);
-    }
-    delay(200);
-}
-
-void motor::return_to_lab_move() {
-    Movement last_rev = get_opposite_movement(pop_history());
-    delay(200);
-    if (index == 0)
-        return;
-    else {
-        drive_straight(last_rev.value.forward.speed, last_rev.value.forward.time);
-        return_to_lab_rotate();
-    }
-}
-
-void motor::return_to_lab_rotate() {
-    Movement last_rev = get_opposite_movement(pop_history());
-    delay(200);
-    if (index == 0)
-        return;
-    else {
-        rotate_robot(last_rev.value.rotation.degrees, last_rev.value.rotation.direction);
-        return_to_lab_move();
-    }
-}
-
-motor::RotatedTo motor::rotate_to_random(int8_t where_to) {
-    motor::RotatedTo rotate_to;
-    switch (where_to) {
-        case 0:
-            rotate_to.degrees = random(BACKWARD_TURN_LB, BACKWARD_TURN_RB);
-            rotate_to.direction = random(2) ? motor::Direction::LEFT : rotate_to.direction = motor::Direction::RIGHT;
-            break;
-        case 1:
-            rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
-            rotate_to.direction = motor::Direction::LEFT;
-            break;
-        case 2:
-            rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
-            rotate_to.direction = motor::Direction::RIGHT;
-            break;
-        default:
-            break;
-    }
-    rotate_robot(rotate_to.degrees, rotate_to.direction);
-    return rotate_to;
+    servo_left.writeMicroseconds(3000 - speed);
+    servo_right.writeMicroseconds(speed);
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

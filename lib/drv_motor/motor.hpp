@@ -50,7 +50,6 @@ namespace motor {
         Direction direction;
         int8_t degrees;
     };
-
     struct Movement {
         enum MovementType { FORWARD,
                             ROTATION };
@@ -101,16 +100,12 @@ namespace motor {
      */
     void drive_straight(int speed, uint32_t time);
 
-    // Speeds: 1440, 1475
+    /**
+     * @brief motor is attached and starts driving straight
+     *
+     * @param speed - 1440, 1475
+     */
     void drive_straight(int16_t speed);
-
-    void return_to_lab_move();
-    void return_to_lab_rotate();
-
-    // Backward 0
-    // To Left (Right detected only) 1
-    // To Right (Left detected only) 2
-    RotatedTo rotate_to_random(int8_t where_to);
 
     /**
      * @brief Rotate the robot in place, relative to its current heading
@@ -148,6 +143,18 @@ namespace motor {
      * @return Movement
      */
     Movement pop_history();
+
+    /**
+     * @brief Attaches motor pins
+     *
+     */
+    void start_motor();
+
+    /**
+     * @brief Detaches motor pins
+     *
+     */
+    void stop_motor();
 
     /**
      * @brief Get the last index of the 'queue'

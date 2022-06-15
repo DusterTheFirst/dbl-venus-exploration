@@ -141,5 +141,5 @@ void loop() {
     // }
 
     // heading += step;
-    motor::drive_straight(1475);
+    pathfinding::random_strategy(1475);
 }
