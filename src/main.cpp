@@ -68,7 +68,7 @@ void loop() {
     // telemetry::send(F("infrared:rock"), infrared::test_detect_rock());
     // telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
 
-    //delay(200);
+    // delay(200);
 
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
@@ -82,7 +82,7 @@ void loop() {
         forward.time = 2000;
         movement.type = movement.FORWARD;
         movement.value.forward = forward;
-        motor::pushHistory(movement);
+        motor::push_history(movement);
 
         motor::Movement movement2;
         motor::rotate_robot(50, motor::Direction::RIGHT);
@@ -91,7 +91,7 @@ void loop() {
         rotation.direction = motor::Direction::RIGHT;
         rotation.degrees = 50;
         movement2.value.rotation = rotation;
-        motor::pushHistory(movement2);
+        motor::push_history(movement2);
         movement2.send();
         turnedOnce = true;
     } else if (time::is_after(5000) && time::is_before(8000) && turnedOnce) {
@@ -103,15 +103,15 @@ void loop() {
         rotation.direction = motor::Direction::LEFT;
         rotation.degrees = 140;
         movement.value.rotation = rotation;
-        motor::pushHistory(movement);
+        motor::push_history(movement);
         movement.send();
         turnedOnce = false;
     }
 
     if (time::is_after(10000)) {
         // telemetry::send(F("history"), true);
-        if (motor::getIndex() >= 1) {
-            motor::Movement movement = motor::getOppositeMovement(motor::popHistory());
+        if (motor::get_index() >= 1) {
+            motor::Movement movement = motor::get_opposite_movement(motor::pop_history());
             if (movement.type == movement.ROTATION) {
                 telemetry::send(F("motor:degrees_rotation_after"), movement.value.rotation.degrees);
                 motor::rotate_robot(movement.value.rotation.degrees, movement.value.rotation.direction);
@@ -140,6 +140,6 @@ void loop() {
     //     step = STEP_BY;
     // }
 
-    // heading += step;   
+    // heading += step;
     motor::drive_straight(1475);
 }

@@ -102,12 +102,12 @@ namespace motor {
     void drive_straight(int speed, uint32_t time);
 
     // Speeds: 1440, 1475
-    void drive_straight(int16_t speed);;
+    void drive_straight(int16_t speed);
 
     void return_to_lab_move();
     void return_to_lab_rotate();
 
-    // Backward 0   
+    // Backward 0
     // To Left (Right detected only) 1
     // To Right (Left detected only) 2
     RotatedTo rotate_to_random(int8_t where_to);
@@ -140,21 +140,21 @@ namespace motor {
      *
      * @param movement
      */
-    void pushHistory(Movement movement);
+    void push_history(Movement movement);
 
     /**
      * @brief pops the last element from the 'queue' of the movement history
      *
      * @return Movement
      */
-    Movement popHistory();
+    Movement pop_history();
 
     /**
      * @brief Get the last index of the 'queue'
      *
      * @return int
      */
-    int getIndex();
+    int get_index();
 
     /**
      * @brief Get the Opposite Movement object
@@ -162,5 +162,5 @@ namespace motor {
      * @param movement
      * @return Movement
      */
-    Movement getOppositeMovement(Movement movement);
+    Movement get_opposite_movement(Movement movement);
 }
