@@ -48,7 +48,7 @@ void gyro::init() {
 
 void gyro::initMPU() {
     // load and configure the DMP
-    telemetry::send(F("gyro:dmp.initialized"), false);
+    telemetry::send(F("gyro:dmp:initialized"), false);
     devStatus = mpu.dmpInitialize();
 
     // Gyro offset
@@ -58,16 +58,16 @@ void gyro::initMPU() {
     mpu.setZAccelOffset(1788); // 1688 factory default
 
     if (devStatus == 0) {
-        telemetry::send(F("gyro:dmp.initialized"), true);
+        telemetry::send(F("gyro:dmp:initialized"), true);
 
         // Calibration Time: MPU6050
         mpu.CalibrateAccel(6);
         mpu.CalibrateGyro(6);
         mpu.PrintActiveOffsets();
         // turn on the DMP, now that it's ready
-        telemetry::send(F("gyro:dmp.enabled"), false);
+        telemetry::send(F("gyro:dmp:enabled"), false);
         mpu.setDMPEnabled(true);
-        telemetry::send(F("gyro:dmp.enabled"), true);
+        telemetry::send(F("gyro:dmp:enabled"), true);
 
         dmpReady = true;
 
@@ -78,7 +78,7 @@ void gyro::initMPU() {
         // 1 = initial memory load failed
         // 2 = DMP configuration updates failed
         // (if it's going to break, usually the code will be 1)
-        telemetry::send(F("gyro:dmp.error_ode"), devStatus);
+        telemetry::send(F("gyro:dmp:error_ode"), devStatus);
     }
 }
 

@@ -28,7 +28,7 @@ bool telemetry::command::process_command() {
     // Reject vectors outside of the table
     if (byte >= VECTOR_TABLE_LENGTH) {
 #if TELEMETRY_COMMAND_DEBUG
-        telemetry::send(F("command:vector.invalid"), byte);
+        telemetry::send(F("command:vector:invalid"), byte);
 #endif
 
         return false;
@@ -37,7 +37,7 @@ bool telemetry::command::process_command() {
     uint8_t index = byte;
 
 #if TELEMETRY_COMMAND_DEBUG
-    telemetry::send(F("command:vector.valid"), byte);
+    telemetry::send(F("command:vector:valid"), byte);
 #endif
 
     telemetry::command::Vector vector =
@@ -45,7 +45,7 @@ bool telemetry::command::process_command() {
 
     if (vector == NULL) {
 #if TELEMETRY_COMMAND_DEBUG
-        telemetry::send(F("command:vector.uninit"), index);
+        telemetry::send(F("command:vector:uninit"), index);
 #endif
 
         return false;

@@ -51,10 +51,13 @@ namespace motor {
         int8_t degrees;
     };
     struct Movement {
-        enum MovementType { FORWARD,
-                            ROTATION };
+        enum MovementType {
+            FORWARD,
+            ROTATION,
+        };
 
         MovementType type;
+
         struct Forward {
             uint32_t time;
             int speed;
@@ -73,7 +76,10 @@ namespace motor {
         inline void send() {
             if (MovementType::ROTATION == type) {
                 telemetry::send(F("movement:degrees"), value.rotation.degrees);
-                telemetry::send(F("movement:direction_left"), value.rotation.direction == Direction::LEFT ? 1 : 0);
+                telemetry::send(F("movement:direction_is_left"),
+                                value.rotation.direction == Direction::LEFT
+                                    ? true
+                                    : false);
             } else {
                 telemetry::send(F("movement:speed"), value.forward.speed);
                 telemetry::send(F("movement:time"), value.forward.time);

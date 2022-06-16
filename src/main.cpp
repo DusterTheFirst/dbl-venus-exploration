@@ -60,14 +60,15 @@ void loop() {
     // Call into command service routines if a command has been received
     telemetry::command::process_command();
 
-    telemetry::send(F("infrared:raw.cliff_left"), infrared::raw::cliff_left());
-    telemetry::send(F("infrared:raw.cliff_right"), infrared::raw::cliff_right());
-    telemetry::send(F("infrared:raw.rock_left"), infrared::raw::rock_left());
-    telemetry::send(F("infrared:raw.rock_right"), infrared::raw::rock_right());
+    telemetry::send(F("infrared:raw:cliff:left"), infrared::raw::cliff_left());
+    telemetry::send(F("infrared:raw:cliff:right"), infrared::raw::cliff_right());
+    telemetry::send(F("infrared:raw:rock:left"), infrared::raw::rock_left());
+    telemetry::send(F("infrared:raw:rock:right"), infrared::raw::rock_right());
 
     infrared::debug_calibration();
 
-    delay(200);
+    // Do not overwhelm the serial (FTDI) chip on cheap knock off boards
+    delay(16);
 
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);

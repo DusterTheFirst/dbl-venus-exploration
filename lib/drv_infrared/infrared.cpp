@@ -71,15 +71,15 @@ struct IRCalibration {
     Calibration rock;
 
     inline void debug(void) {
-        telemetry::send(F("infrared:cliff.ambient"), cliff.ambient);
-        telemetry::send(F("infrared:cliff.reference"), cliff.reference);
-        telemetry::send(F("infrared:cliff.on_thresh"), cliff.on_thresh());
-        telemetry::send(F("infrared:cliff.off_thresh"), cliff.off_thresh());
+        telemetry::send(F("infrared:cliff:ambient"), cliff.ambient);
+        telemetry::send(F("infrared:cliff:reference"), cliff.reference);
+        telemetry::send(F("infrared:cliff:on_thresh"), cliff.on_thresh());
+        telemetry::send(F("infrared:cliff:off_thresh"), cliff.off_thresh());
 
-        telemetry::send(F("infrared:rock.on_thresh"), rock.ambient);
-        telemetry::send(F("infrared:rock.off_thresh"), rock.reference);
-        telemetry::send(F("infrared:rock.on_thresh"), rock.on_thresh());
-        telemetry::send(F("infrared:rock.off_thresh"), rock.off_thresh());
+        telemetry::send(F("infrared:rock:ambient"), rock.ambient);
+        telemetry::send(F("infrared:rock:reference"), rock.reference);
+        telemetry::send(F("infrared:rock:on_thresh"), rock.on_thresh());
+        telemetry::send(F("infrared:rock:off_thresh"), rock.off_thresh());
     }
 };
 
@@ -186,9 +186,9 @@ namespace infrared {
             }
 
             if (samples % 64 == 0) {
-                telemetry::send(F("infrared:calibrating.rock"),
+                telemetry::send(F("infrared:calibrating:rock"),
                                 rock_average);
-                telemetry::send(F("infrared:calibrating.cliff"),
+                telemetry::send(F("infrared:calibrating:cliff"),
                                 cliff_average);
             }
         }
@@ -199,23 +199,23 @@ namespace infrared {
 
     namespace calibrate {
         void ambient(void) {
-            telemetry::send(F("infrared:calibrating.ambient"), true);
+            telemetry::send(F("infrared:calibrating:ambient"), true);
 
             generic_calibrate(&calibration.rock.ambient,
                               &calibration.cliff.ambient);
 
-            telemetry::send(F("infrared:calibrating.ambient"), false);
+            telemetry::send(F("infrared:calibrating:ambient"), false);
 
             store_calibration();
         }
 
         void reference(void) {
-            telemetry::send(F("infrared:calibrating.reference"), true);
+            telemetry::send(F("infrared:calibrating:reference"), true);
 
             generic_calibrate(&calibration.rock.reference,
                               &calibration.cliff.reference);
 
-            telemetry::send(F("infrared:calibrating.reference"), false);
+            telemetry::send(F("infrared:calibrating:reference"), false);
 
             store_calibration();
         }

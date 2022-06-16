@@ -246,10 +246,12 @@ void motor::point_ultrasonic(int8_t heading) {
     // Change reference to left facing = 0
     uint8_t servo_command = 180 - (heading + 90);
 
+#if MOTOR_ULTRASONIC_DEBUG
     // Extra debug telemetry, normally unnecessary
-    telemetry::send(F("ultrasonic:heading.servo_command"), servo_command);
-    telemetry::send(F("ultrasonic:heading.pre_heading"), pre_heading);
-    telemetry::send(F("ultrasonic:heading.diff"), diff);
+    telemetry::send(F("ultrasonic:heading:servo_command"), servo_command);
+    telemetry::send(F("ultrasonic:heading:pre_heading"), pre_heading);
+    telemetry::send(F("ultrasonic:heading:diff"), diff);
+#endif
 
     pre_heading = heading;
 
