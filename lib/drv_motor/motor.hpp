@@ -46,7 +46,10 @@ namespace motor {
     //         // telemetry::send(F("movement:degrees"), this->degrees);
     //     }
     // };
-
+    struct RotatedTo {
+        Direction direction;
+        int8_t degrees;
+    };
     struct Movement {
         enum MovementType { FORWARD,
                             ROTATION };
@@ -97,16 +100,12 @@ namespace motor {
      */
     void drive_straight(int speed, uint32_t time);
 
-    // Speeds: 1440, 1475
-    void drive_straight_a(int16_t speed, uint32_t time);
-
-    void return_to_lab_move();
-    void return_to_lab_rotate();
-
-    // Backward
-    // To Left (Right detected only)
-    // To Right (Left detected only)
-    int8_t rotate_to_random(int8_t where_to);
+    /**
+     * @brief motor is attached and starts driving straight
+     *
+     * @param speed - 1440, 1475
+     */
+    void drive_straight(int16_t speed);
 
     /**
      * @brief Rotate the robot in place, relative to its current heading
@@ -136,21 +135,33 @@ namespace motor {
      *
      * @param movement
      */
-    void pushHistory(Movement movement);
+    void push_history(Movement movement);
 
     /**
      * @brief pops the last element from the 'queue' of the movement history
      *
      * @return Movement
      */
-    Movement popHistory();
+    Movement pop_history();
+
+    /**
+     * @brief Attaches motor pins
+     *
+     */
+    void start_motor();
+
+    /**
+     * @brief Detaches motor pins
+     *
+     */
+    void stop_motor();
 
     /**
      * @brief Get the last index of the 'queue'
      *
      * @return int
      */
-    int getIndex();
+    int get_index();
 
     /**
      * @brief Get the Opposite Movement object
@@ -158,5 +169,5 @@ namespace motor {
      * @param movement
      * @return Movement
      */
-    Movement getOppositeMovement(Movement movement);
+    Movement get_opposite_movement(Movement movement);
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 /**
  * @brief Driver for interfacing with the infrared sensors.
  *
@@ -19,7 +21,7 @@ namespace infrared {
 
     /**
      * @brief Raw measurements from the infrared sensors
-     * 
+     *
      */
     namespace raw {
         uint16_t rock_left(void);

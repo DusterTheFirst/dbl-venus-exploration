@@ -19,87 +19,80 @@
 #define MOTOR_STOP 1500
 #define MOTOR_ROTATE_SPEED 30
 
-Servo servoLeft, servoRight, grabberServo, ultrasonicServo;
+Servo servo_left, servo_right, grabber_servo, ultrasonic_servo;
 
 // 1475 and 1440 respectively
 const float SERVO_VEL[2] = { 0.0415, 0.1172 };
 
-/*
-std::default_random_engine dre_gen;
-std::uniform_int_distribution<int> turn_forward(60, 300);
-std::uniform_int_distribution<int> turn_left(200, 340);
-std::uniform_int_distribution<int> turn_right(20, 160);
-*/
-
-motor::Movement movementHistory[20];
+motor::Movement movement_history[20];
 int index = 0;
 
-void motor::pushHistory(Movement movement) {
-    movementHistory[index++] = movement;
+void motor::push_history(Movement movement) {
+    movement_history[index++] = movement;
 }
 
-motor::Movement motor::popHistory() {
-    return movementHistory[--index];
+motor::Movement motor::pop_history() {
+    return movement_history[--index];
 }
 
-motor::Movement motor::getOppositeMovement(Movement movement) {
-    Movement oppositeMovement;
+motor::Movement motor::get_opposite_movement(Movement movement) {
+    Movement opposite_movement;
     if (movement.type == movement.ROTATION) {
-        oppositeMovement.value.rotation.direction = movement.value.rotation.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
-        oppositeMovement.value.rotation.degrees = movement.value.rotation.degrees;
+        opposite_movement.value.rotation.direction = movement.value.rotation.direction == Direction::LEFT ? Direction::RIGHT : Direction::LEFT;
+        opposite_movement.value.rotation.degrees = movement.value.rotation.degrees;
     } else if (movement.type == movement.FORWARD) {
-        oppositeMovement.value.forward.speed = 3000 - movement.value.forward.speed;
-        oppositeMovement.value.forward.time = movement.value.forward.time;
+        opposite_movement.value.forward.speed = 3000 - movement.value.forward.speed;
+        opposite_movement.value.forward.time = movement.value.forward.time;
     }
-    oppositeMovement.type = movement.type;
+    opposite_movement.type = movement.type;
 
-    return oppositeMovement;
+    return opposite_movement;
 }
 
-int motor::getIndex() {
+int motor::get_index() {
     return index;
 }
 
 void motor::init() {
-    grabberServo.attach(GRABBER_PIN);
-    grabberServo.write(GRABBER_DEGREES_CLOSED);
+    grabber_servo.attach(GRABBER_PIN);
+    grabber_servo.write(GRABBER_DEGREES_CLOSED);
 
-    ultrasonicServo.attach(ULTRASONIC_SERVO_PIN);
-    ultrasonicServo.write(0);
+    ultrasonic_servo.attach(ULTRASONIC_SERVO_PIN);
+    ultrasonic_servo.write(0);
 
-    servoLeft.attach(SERVO_LEFT_PIN);
-    servoLeft.write(MOTOR_STOP);
+    servo_left.attach(SERVO_LEFT_PIN);
+    servo_left.write(MOTOR_STOP);
 
-    servoRight.attach(SERVO_RIGHT_PIN);
-    servoRight.write(MOTOR_STOP);
+    servo_right.attach(SERVO_RIGHT_PIN);
+    servo_right.write(MOTOR_STOP);
 }
 
-void stop_motor() {
-    servoLeft.write(MOTOR_STOP);
-    servoLeft.detach();
+void motor::stop_motor() {
+    servo_left.write(MOTOR_STOP);
+    servo_left.detach();
 
-    servoRight.write(MOTOR_STOP);
-    servoRight.detach();
+    servo_right.write(MOTOR_STOP);
+    servo_right.detach();
 }
 
-void start_motor() {
-    servoLeft.write(MOTOR_STOP);
-    servoLeft.attach(SERVO_LEFT_PIN);
+void motor::start_motor() {
+    servo_left.write(MOTOR_STOP);
+    servo_left.attach(SERVO_LEFT_PIN);
 
-    servoRight.write(MOTOR_STOP);
-    servoRight.attach(SERVO_RIGHT_PIN);
+    servo_right.write(MOTOR_STOP);
+    servo_right.attach(SERVO_RIGHT_PIN);
 }
 
 void motor::turn_direction(Direction direction) {
     switch (direction) {
         case Direction::RIGHT: {
-            servoLeft.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
-            servoRight.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
+            servo_left.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
+            servo_right.writeMicroseconds(MOTOR_STOP + MOTOR_ROTATE_SPEED);
             break;
         }
         case Direction::LEFT: {
-            servoLeft.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
-            servoRight.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
+            servo_left.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
+            servo_right.writeMicroseconds(MOTOR_STOP - MOTOR_ROTATE_SPEED);
             break;
         }
     }
@@ -109,13 +102,13 @@ void motor::actuate_grabber(GrabberPosition position) {
     switch (position) {
         case GrabberPosition::OPEN: {
             // close the grabber
-            grabberServo.write(GRABBER_DEGREES_CLOSED);
+            grabber_servo.write(GRABBER_DEGREES_CLOSED);
 
             break;
         }
         case GrabberPosition::CLOSED: {
             // open the grabber
-            grabberServo.write(GRABBER_DEGREES_OPEN);
+            grabber_servo.write(GRABBER_DEGREES_OPEN);
 
             break;
         }
@@ -147,100 +140,22 @@ int16_t interpolation(float motorSpeed) {
 }
 
 void motor::drive_straight(int speed, uint32_t time) {
-
     start_motor();
-    telemetry::send(F("motor:drive_speed"), speed);
-    // int interpolated_speed = interpolation(speed);
 
     long start = millis();
     while (millis() - start <= time) {
 
-        // telemetry::send(F("motor:drive_micros"), interpolated_speed);
-        // servoLeft.writeMicroseconds(interpolated_speed);
-        // servoRight.writeMicroseconds(3000 - interpolated_speed);
-        // telemetry::send(F("motor:drive_micros"), speed);
-        servoLeft.writeMicroseconds(3000 - speed);
-        servoRight.writeMicroseconds(speed);
+        servo_left.writeMicroseconds(3000 - speed);
+        servo_right.writeMicroseconds(speed);
     }
 
     stop_motor();
 }
 
-// Send -1 for no time
-void motor::drive_straight_a(int16_t speed, uint32_t time) {
-    Movement ret;
-    ret.type = ret.FORWARD;
-    ret.value.forward.speed = speed;
-
-    servoLeft.attach(SERVO_LEFT_PIN);
-    servoRight.attach(SERVO_RIGHT_PIN);
-
-    /* 0 - Default
-     * 1 - Rock
-     * 2 - Left cliff
-     * 3 - Right cliff
-     * 4 - Forward cliff
-     * 5 - Ultrasound
-     */
-    uint8_t end_condition = 0;
-    uint32_t start_time = millis();
-    uint32_t end_time;
-
-    while (end_time <= time) {
-        end_time = millis() - start_time;
-        if (infrared::detect::rock_left() ||
-            infrared::detect::rock_right()) {
-            end_condition = 1;
-            break;
-        } else if (infrared::detect::cliff_left() ||
-                   infrared::detect::cliff_right()) {
-
-        } else if (ultrasonic::distance() < 18) {
-            end_condition = 5;
-            break;
-        }
-    }
-    stop_motor();
-    ret.value.forward.time = end_time;
-    pushHistory(ret);
-
-    switch (end_condition) {
-        case 1:
-            actuate_grabber(GrabberPosition::OPEN);
-            // Align to rock
-            servoLeft.attach(SERVO_LEFT_PIN);
-            servoRight.attach(SERVO_RIGHT_PIN);
-            // Align to rock cont...
-            actuate_grabber(GrabberPosition::CLOSED);
-            return_to_lab_move();
-            break;
-        case 2:
-        default:
-            break;
-    }
-}
-
-void motor::return_to_lab_move() {
-    Movement last_rev = getOppositeMovement(popHistory());
-    if (index == 0)
-        return;
-    else {
-        drive_straight_a(last_rev.value.forward.speed, last_rev.value.forward.time);
-        return_to_lab_rotate();
-    }
-}
-
-void motor::return_to_lab_rotate() {
-    Movement last_rev = getOppositeMovement(popHistory());
-    if (index == 0)
-        return;
-    else {
-        rotate_robot(last_rev.value.rotation.degrees, last_rev.value.rotation.direction);
-        return_to_lab_move();
-    }
-}
-
-int8_t motor::rotate_to_random(int8_t where_to) {
+void motor::drive_straight(int speed) {
+    start_motor();
+    servo_left.writeMicroseconds(3000 - speed);
+    servo_right.writeMicroseconds(speed);
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {
@@ -338,7 +253,7 @@ void motor::point_ultrasonic(int8_t heading) {
 
     pre_heading = heading;
 
-    ultrasonicServo.write(servo_command);
+    ultrasonic_servo.write(servo_command);
 
     delay(diff * 5);
 }
