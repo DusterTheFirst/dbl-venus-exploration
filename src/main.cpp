@@ -35,7 +35,7 @@ void setup() {
     gyro::init();
     // delay(3000);
     motor::init();
-    // infrared::init();
+    infrared::init();
 
     telemetry::send(F("main:initializing"), false);
     telemetry::send(F("main:running"), true);
@@ -58,17 +58,21 @@ uint16_t last_readings[181] = { 0 };
 
 void loop() {
     // Call into command service routines if a command has been received
-    // telemetry::command::process_command();
+    telemetry::command::process_command();
 
-    // uint16_t test = infrared::test_raw();
-    // float voltage = ((float)test / (float)(1 << 10)) * 5.0;
-    // telemetry::send(F("infrared:test"), test);
-    // telemetry::send(F("infrared:voltage"), voltage);
+    telemetry::send(F("infrared:raw.cliff_left"), infrared::raw::cliff_left());
+    telemetry::send(F("infrared:raw.cliff_right"), infrared::raw::cliff_right());
+    telemetry::send(F("infrared:raw.rock_left"), infrared::raw::rock_left());
+    telemetry::send(F("infrared:raw.rock_right"), infrared::raw::rock_right());
 
-    // telemetry::send(F("infrared:rock"), infrared::test_detect_rock());
-    // telemetry::send(F("infrared:cliff"), infrared::test_detect_cliff());
+    infrared::debug_calibration();
 
-    //delay(200);
+    telemetry::send(F("infrared:detect.rock_left"), infrared::detect::rock_left());
+    telemetry::send(F("infrared:detect.rock_right"), infrared::detect::rock_right());
+    telemetry::send(F("infrared:detect.cliff_left"), infrared::detect::cliff_left());
+    telemetry::send(F("infrared:detect.cliff_right"), infrared::detect::cliff_right());
+
+    delay(200);
 
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
@@ -140,5 +144,5 @@ void loop() {
     //     step = STEP_BY;
     // }
 
-    // heading += step;   
+    // heading += step;
 }
