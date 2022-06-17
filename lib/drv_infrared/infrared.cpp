@@ -185,7 +185,7 @@ namespace infrared {
                                  (float)samples;
             }
 
-            if (samples % 64 == 0) {
+            if (samples % 256 == 0) {
                 telemetry::send(F("infrared:calibrating:rock"),
                                 rock_average);
                 telemetry::send(F("infrared:calibrating:cliff"),
