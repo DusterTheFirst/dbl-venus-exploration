@@ -51,7 +51,7 @@ motor::RotatedTo rotate_to_random(int8_t where_to) {
     switch (where_to) {
         case 0:
             rotate_to.degrees = random(BACKWARD_TURN_LB, BACKWARD_TURN_RB);
-            rotate_to.direction = random(2) ? motor::Direction::LEFT : rotate_to.direction = motor::Direction::RIGHT;
+            rotate_to.direction = (random(2) ? motor::Direction::LEFT : motor::Direction::RIGHT);
             break;
         case 1:
             rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
