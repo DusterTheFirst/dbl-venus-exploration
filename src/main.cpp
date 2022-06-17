@@ -65,6 +65,11 @@ void loop() {
     telemetry::send(F("infrared:raw:rock:left"), infrared::raw::rock_left());
     telemetry::send(F("infrared:raw:rock:right"), infrared::raw::rock_right());
 
+    telemetry::send(F("infrared:detect:cliff:left"), infrared::detect::cliff_left());
+    telemetry::send(F("infrared:detect:cliff:right"), infrared::detect::cliff_right());
+    telemetry::send(F("infrared:detect:rock:left"), infrared::detect::rock_left());
+    telemetry::send(F("infrared:detect:rock:right"), infrared::detect::rock_right());
+
     infrared::debug_calibration();
 
     // Do not overwhelm the serial (FTDI) chip on cheap knock off boards
@@ -141,5 +146,5 @@ void loop() {
     // }
 
     // heading += step;
-    pathfinding::random_strategy(1475);
+    // pathfinding::random_strategy(1475);
 }
