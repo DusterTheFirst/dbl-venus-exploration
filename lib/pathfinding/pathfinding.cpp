@@ -17,6 +17,35 @@ void avoid_mountain() {
     }
 }
 
+void pathfinding::grab_rock() {
+        bool left = false;
+        motor::stop_motor();
+        motor::actuate_grabber(motor::GrabberPosition::OPEN);
+        delay(2000);
+        motor::start_motor();
+        if (infrared::detect::rock_left()) {
+            motor::rotate_robot(10, motor::Direction::LEFT);
+            left = true;
+        }
+        else if (infrared::detect::rock_right()) {
+             motor::rotate_robot(10, motor::Direction::RIGHT);
+        }
+        delay(1000);
+        motor::drive_straight(1475, 0.75);
+        motor::stop_motor();
+        delay(1000);
+        motor::actuate_grabber(motor::GrabberPosition::CLOSED);
+        delay(2000);
+        motor::Movement temp;
+        temp.value.forward.speed = 1475;
+        temp.value.forward.time = 0.75;
+        temp = motor::get_opposite_movement(temp);
+        motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
+        delay(1000);
+        left == true ? motor::rotate_robot(10, motor::Direction::RIGHT) : motor::rotate_robot(10, motor::Direction::LEFT);
+        motor::stop_motor();
+}
+
 motor::RotatedTo rotate_to_random(int8_t where_to) {
     motor::RotatedTo rotate_to;
     switch (where_to) {
@@ -87,13 +116,7 @@ void pathfinding::random_strategy(int16_t speed) {
     push_history(ret);
 
     if (end_condition == 1) {
-        motor::stop_motor();
-        motor::actuate_grabber(motor::GrabberPosition::OPEN);
-        delay(1000);
-        // Align to rock
-        motor::start_motor();
-        // Align to rock cont...
-        motor::actuate_grabber(motor::GrabberPosition::CLOSED);
+        grab_rock();
         return_to_lab();
     } else {
         motor::RotatedTo ret2;

@@ -154,8 +154,11 @@ void motor::drive_straight(int speed, uint32_t time) {
 
 void motor::drive_straight(int speed) {
     start_motor();
+    
     servo_left.writeMicroseconds(3000 - speed);
     servo_right.writeMicroseconds(speed);
+
+    stop_motor();
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

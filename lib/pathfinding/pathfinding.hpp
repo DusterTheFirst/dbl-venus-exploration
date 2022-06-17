@@ -19,4 +19,6 @@ namespace pathfinding {
      *
      */
     void return_to_lab();
+
+    void grab_rock();
 }
