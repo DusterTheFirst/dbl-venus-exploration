@@ -49,17 +49,18 @@ void pathfinding::grab_rock() {
 void pathfinding::drop_rock() {
     motor::start_motor();
 
-    uint32_t drive_time = 7;
-    uint32_t return_time = 5;
+    uint32_t start_time = millis();
+    uint32_t top_time;
     motor::rotate_robot(180, motor::Direction::LEFT);
     delay(1000);
-    motor::drive_straight(1475, drive_time*1000);
+    while (!infrared::detect::cliff_left() || !infrared::detect::cliff_right()) motor::drive_straight(1475);
+    top_time = millis() - start_time;
     delay(500);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
     delay(2000);
     motor::actuate_grabber(motor::GrabberPosition::CLOSED);
     delay(2000);
-    motor::drive_straight(1525, return_time*1000);
+    motor::drive_straight(1525, top_time*1000);
     delay(1000);
     motor::rotate_robot(180, motor::Direction::LEFT);
     delay(500);
