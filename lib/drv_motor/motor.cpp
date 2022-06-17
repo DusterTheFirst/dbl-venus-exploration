@@ -14,7 +14,7 @@
 #define ULTRASONIC_SERVO_PIN 11
 
 #define GRABBER_DEGREES_CLOSED 0
-#define GRABBER_DEGREES_OPEN 120
+#define GRABBER_DEGREES_OPEN 110
 
 #define MOTOR_STOP 1500
 #define MOTOR_ROTATE_SPEED 30
@@ -102,13 +102,13 @@ void motor::actuate_grabber(GrabberPosition position) {
     switch (position) {
         case GrabberPosition::OPEN: {
             // close the grabber
-            grabber_servo.write(GRABBER_DEGREES_CLOSED);
+            grabber_servo.write(GRABBER_DEGREES_OPEN);
 
             break;
         }
         case GrabberPosition::CLOSED: {
             // open the grabber
-            grabber_servo.write(GRABBER_DEGREES_OPEN);
+            grabber_servo.write(GRABBER_DEGREES_CLOSED);
 
             break;
         }
@@ -154,11 +154,11 @@ void motor::drive_straight(int speed, uint32_t time) {
 
 void motor::drive_straight(int speed) {
     start_motor();
-    
+
     servo_left.writeMicroseconds(3000 - speed);
     servo_right.writeMicroseconds(speed);
 
-    stop_motor();
+    // stop_motor();
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

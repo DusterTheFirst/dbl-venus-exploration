@@ -47,8 +47,8 @@ uint16_t ultrasonic::mock_distance() {
     return distance;
 }
 
-bool mountain() {
-    if (ultrasonic::distance() < 20) {
+bool ultrasonic::mountain() {
+    if (ultrasonic::distance() < 30) {
         return true;
     } else {
         return false;
