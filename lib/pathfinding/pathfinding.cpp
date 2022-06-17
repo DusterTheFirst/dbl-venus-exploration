@@ -2,6 +2,7 @@
 #include <motor.hpp>
 #include <pathfinding.hpp>
 #include <ultrasonic.hpp>
+#include <telemetry.hpp>
 
 #define BACKWARD_TURN_LB 90
 #define BACKWARD_TURN_RB 180
@@ -92,12 +93,16 @@ motor::RotatedTo rotate_to_random(int8_t where_to) {
 
 uint8_t get_end_condition() {
     if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
+        telemetry::send(F("ROCK DETECTED"), 1);
         return 1;
     } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
+        telemetry::send(F("BOTH CLIFFS DETECTED"), 1);
         return 4;
     } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
+        telemetry::send(F("ONE CLIFF DETECTED"), 1);
         return infrared::detect::cliff_left() ? 2 : 3;
     } else if (ultrasonic::distance() < 18) {
+        telemetry::send(F("ULTRASOUND DETECTED"), 1);
         return 5;
     }
 

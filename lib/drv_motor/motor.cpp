@@ -141,6 +141,7 @@ int16_t interpolation(float motorSpeed) {
 
 void motor::drive_straight(int speed, uint32_t time) {
     start_motor();
+    delay(75);
 
     long start = millis();
     while (millis() - start <= time) {
@@ -150,15 +151,18 @@ void motor::drive_straight(int speed, uint32_t time) {
     }
 
     stop_motor();
+    delay(75);
 }
 
 void motor::drive_straight(int speed) {
     start_motor();
-    
+    delay(75);
+
     servo_left.writeMicroseconds(3000 - speed);
     servo_right.writeMicroseconds(speed);
 
     stop_motor();
+    delay(75);
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {
