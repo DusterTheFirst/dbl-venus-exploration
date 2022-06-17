@@ -85,6 +85,7 @@ namespace motor {
                 telemetry::send(F("movement:time"), value.forward.time);
             }
         }
+
     };
 
     /**
