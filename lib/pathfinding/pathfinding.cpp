@@ -31,19 +31,34 @@ void pathfinding::grab_rock() {
              motor::rotate_robot(10, motor::Direction::RIGHT);
         }
         delay(1000);
-        motor::drive_straight(1475, 0.75);
+        motor::drive_straight(1475, 0.75*1000);
         motor::stop_motor();
         delay(1000);
         motor::actuate_grabber(motor::GrabberPosition::CLOSED);
         delay(2000);
         motor::Movement temp;
         temp.value.forward.speed = 1475;
-        temp.value.forward.time = 0.75;
+        temp.value.forward.time = 0.75*1000;
         temp = motor::get_opposite_movement(temp);
         motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
         delay(1000);
         left == true ? motor::rotate_robot(10, motor::Direction::RIGHT) : motor::rotate_robot(10, motor::Direction::LEFT);
         motor::stop_motor();
+}
+
+void pathfinding::drop_rock() {
+    motor::start_motor();
+
+    uint32_t drive_time = 7;
+    uint32_t return_time = 5;
+    motor::rotate_robot(180, motor::Direction::LEFT);
+    motor::drive_straight(1475, drive_time*1000);
+    motor::actuate_grabber(motor::GrabberPosition::OPEN);
+
+    motor::drive_straight(1525, return_time*1000);
+    motor::rotate_robot(180, motor::Direction::LEFT);
+
+    motor::stop_motor();
 }
 
 motor::RotatedTo rotate_to_random(int8_t where_to) {
@@ -148,6 +163,7 @@ void pathfinding::random_strategy(int16_t speed) {
 void pathfinding::return_to_lab() {
 
     if (motor::get_index() == 0) {
+        drop_rock();
         return;
     }
 
