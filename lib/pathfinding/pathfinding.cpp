@@ -33,7 +33,7 @@ void pathfinding::grab_rock() {
         }
         delay(1000);
         motor::drive_straight(1475, 0.75*1000);
-        motor::stop_motor();
+        //motor::stop_motor();
         delay(1000);
         motor::actuate_grabber(motor::GrabberPosition::CLOSED);
         delay(2000);
@@ -115,7 +115,9 @@ void pathfinding::random_strategy(int16_t speed) {
     ret.type = ret.FORWARD;
     ret.value.forward.speed = speed;
 
+    delay(200);
     motor::drive_straight(speed);
+    delay(500);
 
     /* 0 - Default
      * 1 - Rock
@@ -140,7 +142,7 @@ void pathfinding::random_strategy(int16_t speed) {
     end_time = millis() - start_time;
     ret.value.forward.time = end_time;
     start_time = millis();
-    push_history(ret);
+    //push_history(ret);
 
     if (end_condition == 1) {
         grab_rock();
@@ -153,15 +155,26 @@ void pathfinding::random_strategy(int16_t speed) {
             end_time = millis() - start_time;
             motor::stop_motor();
             delay(200);
-            if (end_condition == 2 && !(infrared::detect::cliff_right())) {
-                ret2 = rotate_to_random(2);
-            } else if (end_condition == 3 && !(infrared::detect::cliff_left())) {
-                ret2 = rotate_to_random(1);
-            } else {
-                ret2 = rotate_to_random(0);
-            }
+            
+            if (end_condition == 2 && !(infrared::detect::cliff_right())) end_condition = 11;
+            else if (end_condition == 3 && !(infrared::detect::cliff_left())) end_condition = 12;
+            else end_condition = 13;
+
+            motor::drive_straight(1525, 1500);
+            ret.value.forward.time = ret.value.forward.time - 1500;
+            push_history(ret);
+            delay(500);
+
+            if (end_condition == 11) ret2 = rotate_to_random(2);
+            else if (end_condition == 12)  ret2 = rotate_to_random(1);
+            else ret2 = rotate_to_random(0);
         } else {
             motor::stop_motor();
+            delay(200);
+            motor::drive_straight(1525, 1500);
+            ret.value.forward.time = ret.value.forward.time - 1500;
+            push_history(ret);
+            delay(500);
             ret2 = rotate_to_random(0);
         }
         ret.value.rotation.degrees = ret2.degrees;

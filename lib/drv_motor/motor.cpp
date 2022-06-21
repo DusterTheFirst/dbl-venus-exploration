@@ -160,9 +160,6 @@ void motor::drive_straight(int speed) {
 
     servo_left.writeMicroseconds(3000 - speed);
     servo_right.writeMicroseconds(speed);
-
-    stop_motor();
-    delay(75);
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

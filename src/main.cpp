@@ -146,5 +146,5 @@ void loop() {
     // }
 
     // heading += step;
-    // pathfinding::random_strategy(1475);
+     pathfinding::random_strategy(1475);
 }
