@@ -147,7 +147,7 @@ void motor::drive_straight(int speed, uint32_t time) {
     while (millis() - start <= time) {
 
         servo_left.writeMicroseconds(3000 - speed);
-        servo_right.writeMicroseconds(speed-4);
+        servo_right.writeMicroseconds(speed - 4);
     }
 
     stop_motor();
@@ -159,7 +159,18 @@ void motor::drive_straight(int speed) {
     delay(75);
 
     servo_left.writeMicroseconds(3000 - speed);
-    servo_right.writeMicroseconds(speed-4);
+    servo_right.writeMicroseconds(speed - 4);
+}
+
+void motor::rotate_robot(Direction direction) {
+    start_motor();
+    while (true) {
+        turn_direction(direction);
+        if ((direction == Direction::LEFT && infrared::detect::rock_right()) || (direction == Direction::RIGHT && infrared::detect::rock_left())) {
+            break;
+        }
+    }
+    stop_motor();
 }
 
 bool rotation_destination_reached(int previous_angle, int current_angle) {

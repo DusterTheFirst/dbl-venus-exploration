@@ -85,7 +85,6 @@ namespace motor {
                 telemetry::send(F("movement:time"), value.forward.time);
             }
         }
-
     };
 
     /**
@@ -121,6 +120,8 @@ namespace motor {
      * @param direction The direction in which the robot shall move (left or right)
      */
     void rotate_robot(uint8_t degres, Direction direction);
+
+    void rotate_robot(Direction direction);
 
     /**
      * @brief Give instructions for motors to continuously turn in a given direction
