@@ -24,16 +24,15 @@ void pathfinding::grab_rock() {
     motor::actuate_grabber(motor::GrabberPosition::CLOSED);
     delay(2000);
     motor::start_motor();
-    delay(200);
+    delay(1000);
     if (infrared::detect::rock_left()) {
         motor::rotate_robot(200, motor::Direction::LEFT);
         left = true;
     } else if (infrared::detect::rock_right()) {
         motor::rotate_robot(200, motor::Direction::RIGHT);
     }
-    delay(1000);
+    delay(2000);
     motor::drive_straight(1475, 2.5 * 1000);
-    // motor::stop_motor();
     delay(1000);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
     delay(1500);
