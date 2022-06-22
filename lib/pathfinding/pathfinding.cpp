@@ -62,6 +62,7 @@ void pathfinding::drop_rock() {
     delay(2000);
     motor::drive_straight(1475);
     while (!infrared::detect::cliff_left() && !infrared::detect::cliff_right()) {}
+    motor::stop_motor();
     top_time = millis() - start_time;
     delay(750);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
