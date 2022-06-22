@@ -50,13 +50,6 @@ void setup() {
     time::init();
 }
 
-#define STEP_BY 1
-
-int8_t heading = -90;
-int8_t step = STEP_BY;
-
-uint16_t last_readings[181] = { 0 };
-
 void loop() {
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
@@ -129,5 +122,8 @@ void loop() {
     // }
 
     // heading += step;
-     pathfinding::random_strategy(1475);
+    pathfinding::random_strategy(1475);
+    // delay(2000);
+    // motor::rotate_robot(10, motor::Direction::LEFT);
+    // delay(10000);
 }
