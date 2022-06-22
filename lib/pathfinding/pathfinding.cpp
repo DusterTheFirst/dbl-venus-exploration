@@ -25,27 +25,27 @@ void pathfinding::grab_rock() {
     delay(2000);
     motor::start_motor();
     if (infrared::detect::rock_left()) {
-        motor::rotate_robot(10, motor::Direction::LEFT);
+        motor::rotate_robot(20, motor::Direction::LEFT);
         left = true;
     } else if (infrared::detect::rock_right()) {
-        motor::rotate_robot(10, motor::Direction::RIGHT);
+        motor::rotate_robot(20, motor::Direction::RIGHT);
     }
     delay(1000);
-    motor::drive_straight(1475, 1.25 * 1000);
+    motor::drive_straight(1475, 1.5 * 1000);
     // motor::stop_motor();
     delay(1000);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
     delay(1500);
     motor::Movement temp;
     temp.value.forward.speed = 1475;
-    temp.value.forward.time = 1.25 * 1000;
+    temp.value.forward.time = 1.5 * 1000;
     temp = motor::get_opposite_movement(temp);
     motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
     delay(1000);
     if (left) {
-        motor::rotate_robot(8, motor::Direction::RIGHT);
+        motor::rotate_robot(18, motor::Direction::RIGHT);
     } else {
-        motor::rotate_robot(8, motor::Direction::LEFT);
+        motor::rotate_robot(18, motor::Direction::LEFT);
     }
     motor::stop_motor();
 }
@@ -157,7 +157,7 @@ void pathfinding::random_strategy(int16_t speed) {
         motor::RotatedTo ret2;
         ret.type = ret.ROTATION;
         if (end_condition <= 3) {
-            delay(500);
+            delay(250);
             end_time = millis() - start_time;
             motor::stop_motor();
             delay(200);
@@ -170,7 +170,7 @@ void pathfinding::random_strategy(int16_t speed) {
                 end_condition = 13;
 
             motor::drive_straight(1525, 1500);
-            ret.value.forward.time = ret.value.forward.time - 2200;
+            ret.value.forward.time = ret.value.forward.time - 1950;
             push_history(ret);
             delay(500);
 
@@ -184,7 +184,7 @@ void pathfinding::random_strategy(int16_t speed) {
             motor::stop_motor();
             delay(200);
             motor::drive_straight(1525, 1500);
-            ret.value.forward.time = ret.value.forward.time - 1500;
+            ret.value.forward.time = ret.value.forward.time - 1700;
             push_history(ret);
             delay(500);
             ret2 = rotate_to_random(0);
