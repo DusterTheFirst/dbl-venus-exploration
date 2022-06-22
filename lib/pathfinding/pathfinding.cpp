@@ -1,8 +1,8 @@
 #include <infrared.hpp>
 #include <motor.hpp>
 #include <pathfinding.hpp>
-#include <ultrasonic.hpp>
 #include <telemetry.hpp>
+#include <ultrasonic.hpp>
 
 #define BACKWARD_TURN_LB 90
 #define BACKWARD_TURN_RB 180
@@ -19,32 +19,35 @@ void avoid_mountain() {
 }
 
 void pathfinding::grab_rock() {
-        bool left = false;
-        motor::stop_motor();
-        motor::actuate_grabber(motor::GrabberPosition::CLOSED);
-        delay(2000);
-        motor::start_motor();
-        if (infrared::detect::rock_left()) {
-            motor::rotate_robot(10, motor::Direction::LEFT);
-            left = true;
-        }
-        else if (infrared::detect::rock_right()) {
-             motor::rotate_robot(10, motor::Direction::RIGHT);
-        }
-        delay(1000);
-        motor::drive_straight(1475, 1.25*1000);
-        //motor::stop_motor();
-        delay(1000);
-        motor::actuate_grabber(motor::GrabberPosition::OPEN);
-        delay(1500);
-        motor::Movement temp;
-        temp.value.forward.speed = 1475;
-        temp.value.forward.time = 1.25*1000;
-        temp = motor::get_opposite_movement(temp);
-        motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
-        delay(1000);
-        left == true ? motor::rotate_robot(8, motor::Direction::RIGHT) : motor::rotate_robot(8, motor::Direction::LEFT);
-        motor::stop_motor();
+    bool left = false;
+    motor::stop_motor();
+    motor::actuate_grabber(motor::GrabberPosition::CLOSED);
+    delay(2000);
+    motor::start_motor();
+    if (infrared::detect::rock_left()) {
+        motor::rotate_robot(10, motor::Direction::LEFT);
+        left = true;
+    } else if (infrared::detect::rock_right()) {
+        motor::rotate_robot(10, motor::Direction::RIGHT);
+    }
+    delay(1000);
+    motor::drive_straight(1475, 1.25 * 1000);
+    // motor::stop_motor();
+    delay(1000);
+    motor::actuate_grabber(motor::GrabberPosition::OPEN);
+    delay(1500);
+    motor::Movement temp;
+    temp.value.forward.speed = 1475;
+    temp.value.forward.time = 1.25 * 1000;
+    temp = motor::get_opposite_movement(temp);
+    motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
+    delay(1000);
+    if (left) {
+        motor::rotate_robot(8, motor::Direction::RIGHT);
+    } else {
+        motor::rotate_robot(8, motor::Direction::LEFT);
+    }
+    motor::stop_motor();
 }
 
 void pathfinding::drop_rock() {
@@ -54,14 +57,15 @@ void pathfinding::drop_rock() {
     uint32_t top_time;
     motor::rotate_robot(180, motor::Direction::LEFT);
     delay(1000);
-    while (!infrared::detect::cliff_left() || !infrared::detect::cliff_right()) motor::drive_straight(1475);
+    while (!infrared::detect::cliff_left() || !infrared::detect::cliff_right())
+        motor::drive_straight(1475);
     top_time = millis() - start_time;
     delay(500);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
     delay(2000);
     motor::actuate_grabber(motor::GrabberPosition::CLOSED);
     delay(2000);
-    motor::drive_straight(1525, top_time*1000);
+    motor::drive_straight(1525, top_time * 1000);
     delay(1000);
     motor::rotate_robot(180, motor::Direction::LEFT);
     delay(500);
@@ -74,7 +78,8 @@ motor::RotatedTo rotate_to_random(int8_t where_to) {
     switch (where_to) {
         case 0:
             rotate_to.degrees = random(BACKWARD_TURN_LB, BACKWARD_TURN_RB);
-            rotate_to.direction = (random(2) ? motor::Direction::LEFT : motor::Direction::RIGHT);
+            rotate_to.direction = random(2) == 1 ? motor::Direction::LEFT
+                                                 : motor::Direction::RIGHT;
             break;
         case 1:
             rotate_to.degrees = random(TURN_MIN_BOUND, TURN_MAX_BOUND);
@@ -95,10 +100,12 @@ uint8_t get_end_condition() {
     if (infrared::detect::rock_left() || infrared::detect::rock_right()) {
         telemetry::send(F("ROCK DETECTED"), 1);
         return 1;
-    } else if (infrared::detect::cliff_left() && infrared::detect::cliff_right()) {
+    } else if (infrared::detect::cliff_left() &&
+               infrared::detect::cliff_right()) {
         telemetry::send(F("BOTH CLIFFS DETECTED"), 1);
         return 4;
-    } else if (infrared::detect::cliff_left() || infrared::detect::cliff_right()) {
+    } else if (infrared::detect::cliff_left() ||
+               infrared::detect::cliff_right()) {
         telemetry::send(F("ONE CLIFF DETECTED"), 1);
         return infrared::detect::cliff_left() ? 2 : 3;
     } else if (ultrasonic::distance() < 18) {
@@ -131,7 +138,6 @@ void pathfinding::random_strategy(int16_t speed) {
     uint32_t end_time;
 
     while (true) {
-
         end_condition = get_end_condition();
 
         if (end_condition != 0) {
@@ -142,7 +148,7 @@ void pathfinding::random_strategy(int16_t speed) {
     end_time = millis() - start_time;
     ret.value.forward.time = end_time;
     start_time = millis();
-    //push_history(ret);
+    // push_history(ret);
 
     if (end_condition == 1) {
         grab_rock();
@@ -155,19 +161,25 @@ void pathfinding::random_strategy(int16_t speed) {
             end_time = millis() - start_time;
             motor::stop_motor();
             delay(200);
-            
-            if (end_condition == 2 && !(infrared::detect::cliff_right())) end_condition = 11;
-            else if (end_condition == 3 && !(infrared::detect::cliff_left())) end_condition = 12;
-            else end_condition = 13;
+
+            if (end_condition == 2 && !(infrared::detect::cliff_right()))
+                end_condition = 11;
+            else if (end_condition == 3 && !(infrared::detect::cliff_left()))
+                end_condition = 12;
+            else
+                end_condition = 13;
 
             motor::drive_straight(1525, 1500);
             ret.value.forward.time = ret.value.forward.time - 2200;
             push_history(ret);
             delay(500);
 
-            if (end_condition == 11) ret2 = rotate_to_random(2);
-            else if (end_condition == 12)  ret2 = rotate_to_random(1);
-            else ret2 = rotate_to_random(0);
+            if (end_condition == 11)
+                ret2 = rotate_to_random(2);
+            else if (end_condition == 12)
+                ret2 = rotate_to_random(1);
+            else
+                ret2 = rotate_to_random(0);
         } else {
             motor::stop_motor();
             delay(200);
@@ -184,27 +196,31 @@ void pathfinding::random_strategy(int16_t speed) {
     delay(200);
 }
 
-// TODO: the return to lab should be combined in one function that detects the type of movement
+// TODO: the return to lab should be combined in one function that detects the
+// type of movement
 void pathfinding::return_to_lab() {
-
     if (motor::get_index() == 0) {
         drop_rock();
         return;
     }
 
-    motor::Movement last_movement = motor::get_opposite_movement(motor::pop_history());
+    motor::Movement last_movement =
+        motor::get_opposite_movement(motor::pop_history());
 
     if (last_movement.type == motor::Movement::FORWARD) {
-        motor::drive_straight(last_movement.value.forward.speed, last_movement.value.forward.time);
+        motor::drive_straight(last_movement.value.forward.speed,
+                              last_movement.value.forward.time);
     } else {
-        motor::rotate_robot(last_movement.value.rotation.degrees, last_movement.value.rotation.direction);
+        motor::rotate_robot(last_movement.value.rotation.degrees,
+                            last_movement.value.rotation.direction);
     }
 
     delay(500);
 }
 
 // void return_to_lab_rotate() {
-//     motor::Movement last_rev = motor::get_opposite_movement(motor::pop_history());
+//     motor::Movement last_rev = 
+//                 motor::get_opposite_movement(motor::pop_history());
 //     delay(200);
 //     if (motor::get_index() == 0) {
 //         return;

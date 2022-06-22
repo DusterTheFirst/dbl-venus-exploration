@@ -14,7 +14,7 @@
 #include <pathfinding.hpp>
 
 // ----- Include timekeeping -----
-#include <time.h>
+#include <time.hpp>
 
 bool turnedOnce;
 
@@ -57,24 +57,6 @@ int8_t step = STEP_BY;
 uint16_t last_readings[181] = { 0 };
 
 void loop() {
-    // Call into command service routines if a command has been received
-    telemetry::command::process_command();
-
-    telemetry::send(F("infrared:raw:cliff:left"), infrared::raw::cliff_left());
-    telemetry::send(F("infrared:raw:cliff:right"), infrared::raw::cliff_right());
-    telemetry::send(F("infrared:raw:rock:left"), infrared::raw::rock_left());
-    telemetry::send(F("infrared:raw:rock:right"), infrared::raw::rock_right());
-
-    telemetry::send(F("infrared:detect:cliff:left"), infrared::detect::cliff_left());
-    telemetry::send(F("infrared:detect:cliff:right"), infrared::detect::cliff_right());
-    telemetry::send(F("infrared:detect:rock:left"), infrared::detect::rock_left());
-    telemetry::send(F("infrared:detect:rock:right"), infrared::detect::rock_right());
-
-    infrared::debug_calibration();
-
-    // Do not overwhelm the serial (FTDI) chip on cheap knock off boards
-    delay(16);
-
     // telemetry::send(F("history"), true);
     //   motor::rotate_robot(50, motor::Direction::RIGHT);
 

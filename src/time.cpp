@@ -1,4 +1,4 @@
-#include <time.h>
+#include "time.hpp"
 
 static uint32_t beginning_of_time;
 
