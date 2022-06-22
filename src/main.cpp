@@ -129,5 +129,7 @@ void loop() {
     // }
 
     // heading += step;
+    motor::rotate_robot(1, motor::Direction::LEFT);
+    delay(250);
      pathfinding::random_strategy(1475);
 }

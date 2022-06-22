@@ -26,10 +26,10 @@ void pathfinding::grab_rock() {
     motor::start_motor();
     delay(1000);
     if (infrared::detect::rock_left()) {
-        motor::rotate_robot(200, motor::Direction::LEFT);
+        motor::rotate_robot(20, motor::Direction::LEFT);
         left = true;
     } else if (infrared::detect::rock_right()) {
-        motor::rotate_robot(200, motor::Direction::RIGHT);
+        motor::rotate_robot(20, motor::Direction::RIGHT);
     }
     delay(2000);
     motor::drive_straight(1475, 2.5 * 1000);
@@ -43,9 +43,9 @@ void pathfinding::grab_rock() {
     motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
     delay(1000);
     if (left) {
-        motor::rotate_robot(18, motor::Direction::RIGHT);
+        motor::rotate_robot(20, motor::Direction::RIGHT);
     } else {
-        motor::rotate_robot(18, motor::Direction::LEFT);
+        motor::rotate_robot(20, motor::Direction::LEFT);
     }
     delay(1000);
     motor::stop_motor();
