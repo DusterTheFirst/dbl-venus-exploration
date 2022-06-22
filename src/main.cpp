@@ -43,6 +43,7 @@ void setup() {
     // motor::rotate_robot(50, motor::Direction::RIGHT);
     // delay(5000);
     // motor::rotate_robot(140, motor::Direction::LEFT);
+    motor::point_ultrasonic(0);
 
     turnedOnce = false;
 
