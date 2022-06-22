@@ -175,7 +175,7 @@ void pathfinding::random_strategy(int16_t speed) {
                 end_condition = 13;
 
             motor::drive_straight(1525, 1500);
-            ret.value.forward.time = ret.value.forward.time - 1950;
+            ret.value.forward.time = ret.value.forward.time - 1250;
             push_history(ret);
             delay(500);
 
@@ -189,7 +189,7 @@ void pathfinding::random_strategy(int16_t speed) {
             motor::stop_motor();
             delay(200);
             motor::drive_straight(1525, 1500);
-            ret.value.forward.time = ret.value.forward.time - 1700;
+            ret.value.forward.time = ret.value.forward.time - 1500;
             push_history(ret);
             delay(500);
             ret2 = rotate_to_random(0);
