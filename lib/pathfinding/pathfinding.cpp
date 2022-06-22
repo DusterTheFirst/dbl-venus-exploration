@@ -20,6 +20,7 @@ void avoid_mountain() {
 
 void pathfinding::grab_rock() {
     bool left = false;
+    int rot_amount = 0;
     motor::stop_motor();
     motor::actuate_grabber(motor::GrabberPosition::CLOSED);
     delay(500);
@@ -27,11 +28,11 @@ void pathfinding::grab_rock() {
     delay(500);
     if (infrared::detect::rock_left()) {
         //motor::rotate_robot(20, motor::Direction::LEFT);
-        while(infrared::detect::rock_left()) motor::rotate_robot(5, motor::Direction::LEFT);
+        while(infrared::detect::rock_left()) { motor::rotate_robot(5, motor::Direction::LEFT); rot_amount +=5 ; }
         left = true;
     } else if (infrared::detect::rock_right()) {
        // motor::rotate_robot(20, motor::Direction::RIGHT);
-        while(infrared::detect::rock_right()) motor::rotate_robot(5, motor::Direction::RIGHT);
+        while(infrared::detect::rock_right()) { motor::rotate_robot(5, motor::Direction::RIGHT); rot_amount += 5; }
     }
     delay(1000);
     motor::drive_straight(1475, 1.2 * 1000);
@@ -45,9 +46,9 @@ void pathfinding::grab_rock() {
     motor::drive_straight(temp.value.forward.speed, temp.value.forward.time);
     delay(500);
     if (left) {
-        motor::rotate_robot(15, motor::Direction::RIGHT);
+        motor::rotate_robot(rot_amount, motor::Direction::RIGHT);
     } else {
-        motor::rotate_robot(15, motor::Direction::LEFT);
+        motor::rotate_robot(rot_amount, motor::Direction::LEFT);
     }
     delay(500);
     motor::stop_motor();
