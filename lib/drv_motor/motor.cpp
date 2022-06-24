@@ -146,7 +146,8 @@ void motor::drive_straight(int speed, uint32_t time) {
     while (millis() - start <= time) {
 
         servo_left.writeMicroseconds(3000 - speed);
-        servo_right.writeMicroseconds(speed);
+        if (speed == 1475) servo_right.writeMicroseconds(speed - 2);
+        else servo_right.write(speed + 2);
     }
 
     stop_motor();
@@ -156,7 +157,8 @@ void motor::drive_straight(int speed) {
     start_motor();
     
     servo_left.writeMicroseconds(3000 - speed);
-    servo_right.writeMicroseconds(speed);
+    if (speed == 1475) servo_right.writeMicroseconds(speed - 2);
+    else servo_right.write(speed + 2);
 
     stop_motor();
 }
