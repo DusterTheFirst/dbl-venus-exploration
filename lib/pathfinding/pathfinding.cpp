@@ -22,19 +22,25 @@ void pathfinding::grab_rock() {
     bool left = false;
     int rot_amount = 0;
     motor::stop_motor();
-    motor::actuate_grabber(motor::GrabberPosition::CLOSED);
-    delay(500);
-    motor::start_motor();
+    // motor::actuate_grabber(motor::GrabberPosition::CLOSED);
+    // delay(500);
+    // motor::start_motor();
     delay(500);
     if (infrared::detect::rock_left()) {
-        //motor::rotate_robot(20, motor::Direction::LEFT);
-        while(infrared::detect::rock_left()) { motor::rotate_robot(5, motor::Direction::LEFT); rot_amount +=5 ; }
+        // motor::rotate_robot(20, motor::Direction::LEFT);
+        while (infrared::detect::rock_left()) {
+            motor::rotate_robot(5, motor::Direction::LEFT);
+            rot_amount += 5;
+        }
         left = true;
     } else if (infrared::detect::rock_right()) {
-       // motor::rotate_robot(20, motor::Direction::RIGHT);
-        while(infrared::detect::rock_right()) { motor::rotate_robot(5, motor::Direction::RIGHT); rot_amount += 5; }
+        // motor::rotate_robot(20, motor::Direction::RIGHT);
+        while (infrared::detect::rock_right()) {
+            motor::rotate_robot(5, motor::Direction::RIGHT);
+            rot_amount += 5;
+        }
     }
-    delay(1000);
+    delay(750);
     motor::drive_straight(1475, 1.2 * 1000);
     delay(500);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
@@ -50,32 +56,28 @@ void pathfinding::grab_rock() {
     } else {
         motor::rotate_robot(rot_amount, motor::Direction::LEFT);
     }
-    delay(500);
-    motor::stop_motor();
+    delay(200);
 }
 
 void pathfinding::drop_rock() {
-    motor::start_motor();
-
-    uint32_t start_time = millis();
     uint32_t top_time;
     motor::rotate_robot(180, motor::Direction::LEFT);
-    delay(2000);
+    delay(500);
+    uint32_t start_time = millis();
     motor::drive_straight(1475);
-    while (!infrared::detect::cliff_left() && !infrared::detect::cliff_right()) {}
+    while (!infrared::detect::cliff_left() && !infrared::detect::cliff_right()) {
+    }
     motor::stop_motor();
     top_time = millis() - start_time;
-    delay(750);
+    delay(500);
     motor::actuate_grabber(motor::GrabberPosition::OPEN);
-    delay(1500);
+    delay(500);
     motor::actuate_grabber(motor::GrabberPosition::CLOSED);
-    delay(1500);
+    delay(500);
     motor::drive_straight(1525, top_time);
-    delay(750);
+    delay(500);
     motor::rotate_robot(180, motor::Direction::LEFT);
-    delay(2000);
-
-    motor::stop_motor();
+    delay(200);
 }
 
 motor::RotatedTo rotate_to_random(int8_t where_to) {
@@ -150,10 +152,10 @@ void pathfinding::random_strategy(int16_t speed) {
         }
     }
 
-    //end_time = millis() - start_time;
-    // ret.value.forward.time = end_time;
-    // start_time = millis();
-    // push_history(ret);
+    // end_time = millis() - start_time;
+    //  ret.value.forward.time = end_time;
+    //  start_time = millis();
+    //  push_history(ret);
 
     if (end_condition == 1) {
         grab_rock();
@@ -190,7 +192,7 @@ void pathfinding::random_strategy(int16_t speed) {
             motor::stop_motor();
             delay(200);
             motor::drive_straight(1525, 1500);
-            ret.type = ret.FORWARD; 
+            ret.type = ret.FORWARD;
             ret.value.forward.speed = speed;
             ret.value.forward.time = ret.value.forward.time - 1500;
             push_history(ret);
@@ -210,18 +212,18 @@ void pathfinding::random_strategy(int16_t speed) {
 void pathfinding::return_to_lab() {
     while (motor::get_index() != 0) {
         motor::Movement last_movement = motor::get_opposite_movement(motor::pop_history());
-    if (last_movement.type == motor::Movement::FORWARD) {
-        telemetry::send(F("returning, speed: "), last_movement.value.forward.speed);
-        telemetry::send(F("returning, time: "), last_movement.value.forward.time);
-        motor::drive_straight(last_movement.value.forward.speed,
-                              last_movement.value.forward.time);
-    } else {
-        telemetry::send(F("returning, degreeees: "), last_movement.value.rotation.degrees);
-        telemetry::send(F("returning, dir: "), (uint8_t)last_movement.value.rotation.direction);
-        motor::rotate_robot(last_movement.value.rotation.degrees,
-                            last_movement.value.rotation.direction);
-    }
-    delay(500);
+        if (last_movement.type == motor::Movement::FORWARD) {
+            telemetry::send(F("returning, speed: "), last_movement.value.forward.speed);
+            telemetry::send(F("returning, time: "), last_movement.value.forward.time);
+            motor::drive_straight(last_movement.value.forward.speed,
+                                  last_movement.value.forward.time);
+        } else {
+            telemetry::send(F("returning, degreeees: "), last_movement.value.rotation.degrees);
+            telemetry::send(F("returning, dir: "), (uint8_t)last_movement.value.rotation.direction);
+            motor::rotate_robot(last_movement.value.rotation.degrees,
+                                last_movement.value.rotation.direction);
+        }
+        delay(500);
     }
     drop_rock();
     return;

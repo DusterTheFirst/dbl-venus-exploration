@@ -20,6 +20,7 @@ bool turnedOnce;
 
 void setup() {
     telemetry::init();
+    randomSeed(analogRead(0));
 
     // Give the serial port time to connect
     delay(1000);
