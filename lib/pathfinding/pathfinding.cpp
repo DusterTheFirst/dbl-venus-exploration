@@ -150,9 +150,9 @@ void pathfinding::random_strategy(int16_t speed) {
         }
     }
 
-    end_time = millis() - start_time;
-    ret.value.forward.time = end_time;
-    start_time = millis();
+    //end_time = millis() - start_time;
+    // ret.value.forward.time = end_time;
+    // start_time = millis();
     // push_history(ret);
 
     if (end_condition == 1) {
@@ -160,7 +160,6 @@ void pathfinding::random_strategy(int16_t speed) {
         return_to_lab();
     } else {
         motor::RotatedTo ret2;
-        ret.type = ret.ROTATION;
         if (end_condition <= 3) {
             delay(250);
             end_time = millis() - start_time;
@@ -175,7 +174,9 @@ void pathfinding::random_strategy(int16_t speed) {
                 end_condition = 13;
 
             motor::drive_straight(1525, 1500);
-            ret.value.forward.time = ret.value.forward.time - 1250;
+            ret.type = ret.FORWARD;
+            ret.value.forward.time = end_time - 1250;
+            ret.value.forward.speed = speed;
             push_history(ret);
             delay(500);
 
@@ -189,11 +190,14 @@ void pathfinding::random_strategy(int16_t speed) {
             motor::stop_motor();
             delay(200);
             motor::drive_straight(1525, 1500);
+            ret.type = ret.FORWARD; 
+            ret.value.forward.speed = speed;
             ret.value.forward.time = ret.value.forward.time - 1500;
             push_history(ret);
             delay(500);
             ret2 = rotate_to_random(0);
         }
+        ret.type = ret.ROTATION;
         ret.value.rotation.degrees = ret2.degrees;
         ret.value.rotation.direction = ret2.direction;
         push_history(ret);
@@ -205,8 +209,7 @@ void pathfinding::random_strategy(int16_t speed) {
 // type of movement
 void pathfinding::return_to_lab() {
     while (motor::get_index() != 0) {
-        motor::Movement last_movement =
-        motor::get_opposite_movement(motor::pop_history());
+        motor::Movement last_movement = motor::get_opposite_movement(motor::pop_history());
     if (last_movement.type == motor::Movement::FORWARD) {
         telemetry::send(F("returning, speed: "), last_movement.value.forward.speed);
         telemetry::send(F("returning, time: "), last_movement.value.forward.time);
