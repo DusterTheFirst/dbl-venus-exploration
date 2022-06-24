@@ -147,7 +147,8 @@ void motor::drive_straight(int speed, uint32_t time) {
     while (millis() - start <= time) {
 
         servo_left.writeMicroseconds(3000 - speed);
-        servo_right.writeMicroseconds(speed - 4);
+        if (speed == 1475) servo_right.writeMicroseconds(speed - 2);
+        else servo_right.write(speed + 2);
     }
 
     stop_motor();
@@ -159,7 +160,8 @@ void motor::drive_straight(int speed) {
     delay(75);
 
     servo_left.writeMicroseconds(3000 - speed);
-    servo_right.writeMicroseconds(speed - 4);
+    if (speed == 1475) servo_right.writeMicroseconds(speed - 2);
+    else servo_right.write(speed + 2);
 }
 
 void motor::rotate_robot(Direction direction) {
