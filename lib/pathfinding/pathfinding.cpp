@@ -204,23 +204,24 @@ void pathfinding::random_strategy(int16_t speed) {
 // TODO: the return to lab should be combined in one function that detects the
 // type of movement
 void pathfinding::return_to_lab() {
-    if (motor::get_index() == 0) {
-        drop_rock();
-        return;
-    }
-
-    motor::Movement last_movement =
+    while (motor::get_index() != 0) {
+        motor::Movement last_movement =
         motor::get_opposite_movement(motor::pop_history());
-
     if (last_movement.type == motor::Movement::FORWARD) {
+        telemetry::send(F("returning, speed: "), last_movement.value.forward.speed);
+        telemetry::send(F("returning, time: "), last_movement.value.forward.time);
         motor::drive_straight(last_movement.value.forward.speed,
                               last_movement.value.forward.time);
     } else {
+        telemetry::send(F("returning, degreeees: "), last_movement.value.rotation.degrees);
+        telemetry::send(F("returning, dir: "), (uint8_t)last_movement.value.rotation.direction);
         motor::rotate_robot(last_movement.value.rotation.degrees,
                             last_movement.value.rotation.direction);
     }
-
     delay(500);
+    }
+    drop_rock();
+    return;
 }
 
 // void return_to_lab_rotate() {

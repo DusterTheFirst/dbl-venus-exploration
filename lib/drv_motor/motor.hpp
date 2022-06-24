@@ -60,12 +60,12 @@ namespace motor {
 
         struct Forward {
             uint32_t time;
-            int speed;
+            int16_t speed;
         };
 
         struct Rotation {
             Direction direction;
-            int degrees;
+            int16_t degrees;
         };
 
         union {

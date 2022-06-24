@@ -28,11 +28,13 @@ motor::Movement movement_history[20];
 int index = 0;
 
 void motor::push_history(Movement movement) {
-    movement_history[index++] = movement;
+    movement_history[index] = movement;
+    index = min(index + 1, 19);
 }
 
 motor::Movement motor::pop_history() {
-    return movement_history[--index];
+    index = max(index - 1, 0);
+    return movement_history[index];
 }
 
 motor::Movement motor::get_opposite_movement(Movement movement) {
